@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import asyncio
-from crawl4ai import AsyncWebCrawler,CrawlerRunConfig
+from crawl4ai import AsyncWebCrawler,CrawlerRunConfig, BrowserConfig
 from google import genai
 import json
 from pydantic import BaseModel, Field
@@ -44,7 +44,11 @@ class Show(BaseModel):
     theatre:str
     show_title:str
     films:List[Film]
-    special:Optional[str]
+    special:Optional[str]=Field(
+            description="EXTREMELY CONCISE: Only include format (e.g., '4K', '35mm'), "
+                        "anniversaries (e.g., '50th Anniv'), or event types (e.g., 'Activity at 6pm'). "
+                        "Remove all full sentences and marketing descriptions."
+        )
     qa_with:Optional[str]
     screenings:List[Screening]
 
@@ -64,35 +68,47 @@ def extract_show_links(theatre):
         print(f"Error or Timeout:{e}")
 
 async def crawl_shows(show_links, theatre):
+    # Browser Config
+    browseConfig = BrowserConfig(
+        headless=False,
+        verbose=True
+    )
+
     theatreConfig = THEATRE_WEBSITES.get(theatre,{})
     excluded_tags = theatreConfig.get("excluded_tags",[])
     excluded_selectors = (", ").join(theatreConfig.get("excluded_selectors",[]))
+
     crawlerConfig = CrawlerRunConfig(
         excluded_tags = excluded_tags,
         excluded_selector = excluded_selectors,
         remove_forms=True,
         exclude_social_media_links=True,
         exclude_external_links=False,
-        exclude_all_images=True
+        exclude_all_images=True,
+        # This tells the crawler to stay on the page for 3 seconds before crawling
+        delay_before_return_html=3.0,
+        # if the crawling didn't finish in page_timeout seconds, stop the crawling
+        page_timeout=60000
     )
-
-    async with AsyncWebCrawler() as crawler:
+    showDataCollections = []
+    async with AsyncWebCrawler(config=browseConfig) as crawler:
+        # crawl show page and convert it to markdown
         results = await crawler.arun_many(urls=list(show_links),config=crawlerConfig)
         count = 0
         for res in results:
             if res.success:
                 try:
+                    # crawl desired data from the markdown using AI
                     showData = await crawl_movie_data(markdown=res.markdown)
                     if showData:
-                        print(showData)
-                        
+                        showDataCollections.append(showData)
                 except Exception as e:
                     print(f"Gemini API error for {res.url}:{e}")
                 count += 1
             else:
                 print("CRAWL FAILED")
             if count == 3:
-                break
+                return showDataCollections
 
 async def crawl_movie_data(markdown):
     response = await client.aio.models.generate_content(
@@ -110,4 +126,8 @@ async def crawl_movie_data(markdown):
 if __name__ == "__main__":
     show_links = extract_show_links("tiff")
     if show_links:
-        asyncio.run(crawl_shows(show_links, "tiff"))
+        showDataCollection = asyncio.run(crawl_shows(show_links, "tiff"))
+        for showData in showDataCollection:
+            print("============= SHOW DATA ==============")
+            print(showData)
+            print("============= SHOW DATA ==============")
