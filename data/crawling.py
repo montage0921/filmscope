@@ -8,7 +8,7 @@ from crawl4ai import AsyncWebCrawler,CrawlerRunConfig, BrowserConfig
 from google import genai
 import json
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Literal
 from dotenv import load_dotenv
 import os
 
@@ -27,6 +27,12 @@ THEATRE_WEBSITES ={
         "showpage_xpath":"//h3[contains(@class, 'cardTitle')]//a", # each movie page's link
         "excluded_tags":["footer"], 
         "excluded_selectors":['[aria-label="Other Film Recommendations slider section"]','[id="openLegendModal"]'],
+        "button_clicked": """
+                            const button = document.querySelector('button[aria-label="Toggle show more showtimes"]');
+                            if (button) {
+                                button.click();
+                            }
+                            """
     }
 }
 
@@ -41,7 +47,8 @@ class Screening(BaseModel):
     ticket_url:str
 
 class Show(BaseModel):
-    theatre:str
+    theatre: Literal["TIFF Lightbox", "Paradise Theatre"] = Field(
+                description="The specific theatre name. Must match exactly")
     show_title:str
     films:List[Film]
     special:Optional[str]=Field(
@@ -77,18 +84,21 @@ async def crawl_shows(show_links, theatre):
     theatreConfig = THEATRE_WEBSITES.get(theatre,{})
     excluded_tags = theatreConfig.get("excluded_tags",[])
     excluded_selectors = (", ").join(theatreConfig.get("excluded_selectors",[]))
+    js_code = theatreConfig.get("button_clicked","")
 
     crawlerConfig = CrawlerRunConfig(
+        # specify which tags doesn't need to crawl
         excluded_tags = excluded_tags,
         excluded_selector = excluded_selectors,
         remove_forms=True,
         exclude_social_media_links=True,
         exclude_external_links=False,
         exclude_all_images=True,
-        # This tells the crawler to stay on the page for 3 seconds before crawling
-        delay_before_return_html=3.0,
-        # if the crawling didn't finish in page_timeout seconds, stop the crawling
-        page_timeout=60000
+        # specify JS operation
+        js_code=js_code,
+        # specify wait time
+        delay_before_return_html=3.0, # This tells the crawler to stay on the page for 3 seconds before crawling
+        page_timeout=60000 # if the crawling didn't finish in page_timeout seconds, stop the crawling
     )
     showDataCollections = []
     async with AsyncWebCrawler(config=browseConfig) as crawler:
