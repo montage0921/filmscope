@@ -183,6 +183,16 @@ def get_film_id(film, cur):
     else:
         return result[0]
 
+def get_theatre_id(theatre, cur):
+    cur.execute("""
+        SELECT theatre_id from theatre WHERE name = %s
+        """, (theatre,))
+    result = cur.fetchone()
+    if result is None:
+        return None
+    else:
+        return result[0]
+
 def fetch_movie_info_from_TMDB(film):
     headers = {
         "accept": "application/json",
@@ -226,8 +236,17 @@ def fetch_movie_info_from_TMDB(film):
         )
     return film_details
 
-def store_to_shows(show, cur):
-    return
+def store_to_shows(show, theatre_id, cur):
+    cur.execute("""
+                INSERT INTO shows(theatre_id, show_name, special, qa_with)
+                VALUES(%s, %s, %s, %s)
+                RETURNING show_id
+                """,
+                (theatre_id,
+                 show.show_title,
+                 show.special,
+                 show.qa_with))
+    return cur.fetchone()[0]
 
 def store_to_films(fd, cur):
     cur.execute("""
@@ -246,7 +265,7 @@ def store_to_films(fd, cur):
                  fd.countries,  
                  fd.original_title,
                  fd.languages,))
-    return cur.fetchone()
+    return cur.fetchone()[0]
 
 if __name__ == "__main__":
     show_links = extract_show_links("tiff")
@@ -261,18 +280,20 @@ if __name__ == "__main__":
                         print("================")
                         print(show)
                         print("===================")
-                        show_id = store_to_shows(show, cur)
+                        theatre_id = get_theatre_id(show.theatre,cur)
+                        show_id = store_to_shows(show, theatre_id, cur)
                         films = []
                         # store film
                         for film in show.films:
                             id = get_film_id(film, cur)
                             if id is None:
-                                # fetch detailed movie info from TMDB API
-                                film_details = fetch_movie_info_from_TMDB(film)
+                                # # fetch detailed movie info from TMDB API
+                                # film_details = fetch_movie_info_from_TMDB(film)
 
-                                # store detailed movie info to <films> table
-                                film_id = store_to_films(film_details, cur)
-                                print(film_id)
+                                # # store detailed movie info to <films> table
+                                # film_id = store_to_films(film_details, cur)
+                                # print(film_id)
+                                print("hi")
                         conn.commit()
                                 
                                 
