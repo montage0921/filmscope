@@ -10,14 +10,15 @@ import json
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal
 from dotenv import load_dotenv
+import psycopg
 import os
+import requests
 
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
     raise ValueError("GEMINI_API_KEY not found, please check your .env file")
 client = genai.Client(api_key=API_KEY)
-
 
 options = Options()
 driver = webdriver.Chrome(options=options)
@@ -38,7 +39,7 @@ THEATRE_WEBSITES ={
 
 class Film(BaseModel):
     film_title:str
-    release_year:Optional[str]
+    release_year:Optional[int]
     director:Optional[str]
 
 class Screening(BaseModel):
@@ -131,13 +132,153 @@ async def crawl_movie_data(markdown):
     )
 
     return response.parsed
-        
+
+# ============ DATABASE ==========================
+# for database connection
+DATABASE_NAME = os.getenv("DATABASE_NAME")
+USER = os.getenv("USER")
+PASSWORD = os.getenv("PASSWORD")
+HOST = os.getenv("HOST")
+PORT = os.getenv("PORT")
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+
+# DATA MODEL
+class Film_Detail(BaseModel):
+    title:str
+    year:int
+    director:str
+    runtime:Optional[int] = None
+    tconst:Optional[str] = None
+    poster:Optional[str] = None
+    backdrop:Optional[str] = None
+    casts:Optional[str] = ""
+    countries:Optional[str] = ""
+    languages:Optional[str] = ""
+    original_title:Optional[str] = ""
+    genres:Optional[List[str]] = []
+
+
+# connect to database
+def connect_database():
+    try:
+        conn = psycopg.connect(
+                dbname=DATABASE_NAME,
+                user=USER,
+                password=PASSWORD,
+                host=HOST,
+                port=PORT
+            )
+        return conn
+    except psycopg.OperationalError as e:
+        print(f"FAILED: {e}")
+        return None
+
+def get_film_id(film, cur):
+    cur.execute("""
+        SELECT film_id from films WHERE title = %s and year = %s
+        """, (film.film_title, film.release_year))
+    result = cur.fetchone()
+    if result is None:
+        return None
+    else:
+        return result[0]
+
+def fetch_movie_info_from_TMDB(film):
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {TMDB_API_KEY}"
+    }
+
+    url_to_get_id = f"https://api.themoviedb.org/3/search/movie?query={film.film_title}&include_adult=true&language=en-US&page=1&primary_release_year={film.release_year}"
+    response = requests.get(url_to_get_id, headers=headers).json()
+    
+    results = response["results"]
+    if len(results) > 0:
+        id = results[0]["id"]
+        url_to_get_detailedInfo = f"https://api.themoviedb.org/3/movie/{id}?language=en-US&append_to_response=credits"
+        response = requests.get(url_to_get_detailedInfo, headers=headers).json()
+        year = int(response.get("release_date").split("-")[0]) if response.get("release_date") else -1
+        directors = ("/").join([people.get("name") for people in response.get("credits", {}).get("crew", []) if people.get("job") == "Director"])
+        casts = ("/").join([people.get("name") for people in response.get("credits", {}).get("cast", [])[:5]]) # pick first 5 actors
+        countries = ("/").join([country.get("name") for country in response.get("production_countries") or []])
+        languages = ("/").join([language.get("english_name") for language in response.get("spoken_languages",[])])
+        genres = [genre.get("name") for genre in response.get("genres",[])]
+
+        film_details = Film_Detail(
+            title = response.get("title"),
+            year = year,
+            director = directors,
+            runtime = int(response.get("runtime")) if response.get("runtime") else None,
+            tconst = response.get("imdb_id"),
+            poster = response.get("poster_path"),
+            backdrop = response.get("backdrop_path"),
+            casts = casts,
+            countries = countries,
+            languages = languages,
+            original_title = response.get("original_title"),
+            genres = genres # list
+        )
+    else:
+        film_details = Film_Detail(
+            title= film.film_title,
+            year = film.release_year,
+            director = film.director
+        )
+    return film_details
+
+def store_to_shows(show, cur):
+    return
+
+def store_to_films(fd, cur):
+    cur.execute("""
+                INSERT INTO films (title, year, director, runtime, tconst, poster, backdrop, casts, countries, original_title, languages)
+                VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING film_id
+                """, 
+                (fd.title, 
+                 fd.year,
+                 fd.director, 
+                 fd.runtime, 
+                 fd.tconst, 
+                 fd.poster, 
+                 fd.backdrop, 
+                 fd.casts, 
+                 fd.countries,  
+                 fd.original_title,
+                 fd.languages,))
+    return cur.fetchone()
 
 if __name__ == "__main__":
     show_links = extract_show_links("tiff")
-    if show_links:
-        showDataCollection = asyncio.run(crawl_shows(show_links, "tiff"))
-        for showData in showDataCollection:
-            print("============= SHOW DATA ==============")
-            print(showData)
-            print("============= SHOW DATA ==============")
+    conn = connect_database()
+    if conn:
+        try:
+            if show_links:
+                showDataCollection = asyncio.run(crawl_shows(show_links, "tiff"))
+                for show in showDataCollection:
+                    with conn.cursor() as cur:
+                        # store show
+                        print("================")
+                        print(show)
+                        print("===================")
+                        show_id = store_to_shows(show, cur)
+                        films = []
+                        # store film
+                        for film in show.films:
+                            id = get_film_id(film, cur)
+                            if id is None:
+                                # fetch detailed movie info from TMDB API
+                                film_details = fetch_movie_info_from_TMDB(film)
+
+                                # store detailed movie info to <films> table
+                                film_id = store_to_films(film_details, cur)
+                                print(film_id)
+                        conn.commit()
+                                
+                                
+
+
+        except Exception as e:
+            print(f"Something went wrong: {e}")
+        finally:
+            conn.close()
