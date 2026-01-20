@@ -183,6 +183,17 @@ def get_film_id(film, cur):
     else:
         return result[0]
 
+def get_genre_id(genre, cur):
+    cur.execute("""
+        SELECT genre_id from genres WHERE genre = %s
+        """, (genre, ))
+    result = cur.fetchone()
+    if result is None:
+        return None
+    else:
+        return result[0]
+
+
 def get_theatre_id(theatre, cur):
     cur.execute("""
         SELECT theatre_id from theatre WHERE name = %s
@@ -267,6 +278,42 @@ def store_to_films(fd, cur):
                  fd.languages,))
     return cur.fetchone()[0]
 
+def store_to_screenings(screenings, show_id, cur):
+    for s in screenings:
+        cur.execute("""
+        INSERT INTO screenings(show_id, start_date, start_time, ticket_url)
+        VALUES(%s, %s, %s, %s)
+        """,
+        (
+            show_id,
+            s.start_date,
+            s.start_time,
+            s.ticket_url
+        ))
+    return
+
+def store_to_showfilm(show_id, film_id, cur):
+    cur.execute("""
+        INSERT INTO show_films(show_id, film_id)
+        VALUES(%s, %s)
+        """,(show_id, film_id))
+    return
+
+def store_to_genres(genre, cur):
+    cur.execute("""
+        INSERT INTO genres(genre)
+        VALUES(%s)
+        RETURNING genre_id
+        """,(genre, ))
+    return cur.fetchone()[0]
+
+def store_to_genrefilm(genre_id, film_id, cur):
+    cur.execute("""
+        INSERT INTO genre_film(genre_id, film_id)
+        VALUES(%s, %s)
+        """,(genre_id, film_id))
+    return
+
 if __name__ == "__main__":
     show_links = extract_show_links("tiff")
     conn = connect_database()
@@ -275,30 +322,43 @@ if __name__ == "__main__":
             if show_links:
                 showDataCollection = asyncio.run(crawl_shows(show_links, "tiff"))
                 for show in showDataCollection:
-                    with conn.cursor() as cur:
-                        # store show
-                        print("================")
+                    try:
+                        with conn.cursor() as cur:
+                            # store show
+                            theatre_id = get_theatre_id(show.theatre,cur)
+                            show_id = store_to_shows(show, theatre_id, cur)
+                            store_to_screenings(show.screenings, show_id, cur)
+                            # store film
+                            for film in show.films:
+                                try:
+                                    with conn.transaction():
+                                        film_id = get_film_id(film, cur)
+                                        if film_id is None:
+                                            # fetch detailed movie info from TMDB API
+                                            film_details = fetch_movie_info_from_TMDB(film)
+
+                                            # store detailed movie info to <films> table
+                                            film_id = store_to_films(film_details, cur)
+
+                                            if film_details.genres:
+                                                for g in film_details.genres:
+                                                    genre_id = get_genre_id(g, cur)
+                                                    if not genre_id:
+                                                        genre_id = store_to_genres(g, cur)
+                                                    store_to_genrefilm(genre_id, film_id, cur)
+                                            
+                                        # store show-film relationship
+                                        store_to_showfilm(show_id, film_id, cur)
+                                except Exception as e:
+                                    print(f"Error when storing film:{e}")
+                                    print(film)
+                                    print("========================")
+                            conn.commit()
+                    except Exception as e:
+                        print(f"Error when storing show:{e}")
                         print(show)
-                        print("===================")
-                        theatre_id = get_theatre_id(show.theatre,cur)
-                        show_id = store_to_shows(show, theatre_id, cur)
-                        films = []
-                        # store film
-                        for film in show.films:
-                            id = get_film_id(film, cur)
-                            if id is None:
-                                # # fetch detailed movie info from TMDB API
-                                # film_details = fetch_movie_info_from_TMDB(film)
-
-                                # # store detailed movie info to <films> table
-                                # film_id = store_to_films(film_details, cur)
-                                # print(film_id)
-                                print("hi")
-                        conn.commit()
-                                
-                                
-
-
+                        conn.rollback()
+                        print("========================")
         except Exception as e:
             print(f"Something went wrong: {e}")
         finally:
