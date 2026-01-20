@@ -101,11 +101,11 @@ async def crawl_shows(show_links, theatre):
         delay_before_return_html=3.0, # This tells the crawler to stay on the page for 3 seconds before crawling
         page_timeout=60000 # if the crawling didn't finish in page_timeout seconds, stop the crawling
     )
+
     showDataCollections = []
     async with AsyncWebCrawler(config=browseConfig) as crawler:
         # crawl show page and convert it to markdown
         results = await crawler.arun_many(urls=list(show_links),config=crawlerConfig)
-        count = 0
         for res in results:
             if res.success:
                 try:
@@ -115,11 +115,10 @@ async def crawl_shows(show_links, theatre):
                         showDataCollections.append(showData)
                 except Exception as e:
                     print(f"Gemini API error for {res.url}:{e}")
-                count += 1
             else:
                 print("CRAWL FAILED")
-            if count == 3:
-                return showDataCollections
+        print(f"crawled {len(showDataCollections)} pages")
+        return showDataCollections
 
 async def crawl_movie_data(markdown):
     response = await client.aio.models.generate_content(
@@ -349,10 +348,13 @@ if __name__ == "__main__":
                                             
                                         # store show-film relationship
                                         store_to_showfilm(show_id, film_id, cur)
+                                        print(f"stored {film.film_title} successfully 🎉🎞")
                                 except Exception as e:
                                     print(f"Error when storing film:{e}")
                                     print(film)
                                     print("========================")
+                            print(f"stored {show.show_title} successfully 🎉💃")
+                            print("============================================")
                             conn.commit()
                     except Exception as e:
                         print(f"Error when storing show:{e}")
