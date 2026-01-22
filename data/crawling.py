@@ -34,6 +34,13 @@ THEATRE_WEBSITES ={
                                 button.click();
                             }
                             """
+    },
+    "paradise":{
+        "website":"https://paradiseonbloor.com/coming-soon/", # main entry
+        "showpage_xpath":"//a[@class='title']", # each movie page's link
+        "excluded_tags":["footer","header"], 
+        "excluded_selectors":[],
+        "button_clicked": ""
     }
 }
 
@@ -314,12 +321,12 @@ def store_to_genrefilm(genre_id, film_id, cur):
     return
 
 if __name__ == "__main__":
-    show_links = extract_show_links("tiff")
+    show_links = extract_show_links("paradise")
     conn = connect_database()
     if conn:
         try:
             if show_links:
-                showDataCollection = asyncio.run(crawl_shows(show_links, "tiff"))
+                showDataCollection = asyncio.run(crawl_shows(show_links, "paradise"))
                 for show in showDataCollection:
                     try:
                         with conn.cursor() as cur:
