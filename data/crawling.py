@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 import psycopg
 import os
 import requests
+import random
 
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
@@ -83,6 +84,7 @@ def extract_show_links(theatre):
         print(f"Error or Timeout:{e}")
 
 async def crawl_shows(show_links, theatre):
+    semaphore = asyncio.Semaphore(3) # only allow 3 concurrent pages
     # Browser Config
     browseConfig = BrowserConfig(
         headless=False,
@@ -109,10 +111,16 @@ async def crawl_shows(show_links, theatre):
         page_timeout=60000 # if the crawling didn't finish in page_timeout seconds, stop the crawling
     )
 
+    async def throttled_arun(link, crawler):
+        async with semaphore:
+            await asyncio.sleep(random.uniform(1,3))
+            return await crawler.arun(url=link, config=crawlerConfig)
+
     showDataCollections = []
+
     async with AsyncWebCrawler(config=browseConfig) as crawler:
-        # crawl show page and convert it to markdown
-        results = await crawler.arun_many(urls=list(show_links),config=crawlerConfig)
+        tasks = [throttled_arun(link, crawler) for link in list(show_links)]
+        results = await asyncio.gather(*tasks)
         for res in results:
             if res.success:
                 try:
