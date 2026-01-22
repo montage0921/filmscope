@@ -11,15 +11,17 @@ from google import genai
 import random
 from config import THEATRE_WEBSITES
 from model import Show
+from pathlib import Path
 
 # load GEMINI client
-load_dotenv()
+script_folder = Path(__file__).resolve().parent # find parent folder (/data)
+root_folder = script_folder.parent # find root folder (/filmscope)
+env_path = root_folder / ".env"
+load_dotenv(dotenv_path=env_path)
 API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
     raise ValueError("GEMINI_API_KEY not found, please check your .env file")
 client = genai.Client(api_key=API_KEY)
-
-
 
 def extract_show_links(theatre):
     """

@@ -3,9 +3,14 @@ import requests
 from model import Film_Detail
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # for database connection
-load_dotenv()
+script_folder = Path(__file__).resolve().parent # find parent folder (/data)
+root_folder = script_folder.parent # find root folder (/filmscope)
+env_path = root_folder / ".env"
+load_dotenv(dotenv_path=env_path)
+
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 USER = os.getenv("USER")
 PASSWORD = os.getenv("PASSWORD")
