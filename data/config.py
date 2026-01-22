@@ -1,3 +1,4 @@
+THEATRE_NAMES = ["tiff", "paradise"]
 THEATRE_WEBSITES ={
     "tiff":{
         "website":"https://www.tiff.net/calendar", # main entry
