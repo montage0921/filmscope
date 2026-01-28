@@ -3,6 +3,7 @@ package gary.backend.Entity;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +38,7 @@ public class Film {
     private String director;
 
     @Column(name = "runtime")
-    private int runtime;
+    private Integer runtime;
 
     @Column(name = "tconst")
     private String tconst;
@@ -61,7 +62,7 @@ public class Film {
     private String languages;
 
     @ManyToMany(mappedBy = "films")
-    @JsonIgnore
+    @JsonIgnoreProperties("films")
     private List<Show> shows;
 
     @ManyToMany(mappedBy = "films")

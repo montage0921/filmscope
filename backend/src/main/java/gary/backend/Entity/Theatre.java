@@ -2,6 +2,8 @@ package gary.backend.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,5 +37,6 @@ public class Theatre {
     private String address;
 
     @OneToMany(mappedBy = "theatre")
+    @JsonIgnore
     private List<Show> shows;
 }

@@ -2,6 +2,8 @@ package gary.backend.Entity;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +30,7 @@ public class Genre {
     private int genere_id;
 
     @Column(name = "genre")
-    private int genre;
+    private String genre;
 
     @ManyToMany
     @JoinTable(
@@ -36,6 +38,7 @@ public class Genre {
         joinColumns = @JoinColumn(name = "genre_id"),
         inverseJoinColumns = @JoinColumn(name = "film_id")
     )
+    @JsonIgnore
     private Set<Film> films;
 
 }

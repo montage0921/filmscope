@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,6 +55,6 @@ public class Show {
         joinColumns =  @JoinColumn(name = "show_id"),
         inverseJoinColumns = @JoinColumn(name = "film_id")
     )
-    @JsonIgnore
+    @JsonIgnoreProperties("shows")
     private Set<Film> films;
 }
