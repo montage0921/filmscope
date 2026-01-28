@@ -1,9 +1,9 @@
 function App() {
 
   return (
-    <>
+    <div >
       32
-    </>
+    </div>
   )
 }
 
