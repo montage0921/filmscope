@@ -1,1 +1,26 @@
-@import "tailwindcss"
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'PaulSlab';
+  src: url('/fonts/PaulSlab-Bold-Trail.otf') format('opentype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'PaulSlab';
+  src: url('/fonts/PaulSlab-Regular-Trail.otf') format('opentype');
+  font-weight: 400;
+}
+
+@theme {
+  --font-filmscope: "PaulSlab", serif;
+  --font-weight-filmscope: 700;
+}
+
+;@layer base{
+    body{
+        @apply bg-black text-white;
+        @apply font-filmscope;
+    }
+}
+

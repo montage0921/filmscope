@@ -1,0 +1,12 @@
+import React from 'react'
+import Logo from './Components/Logo'
+import Login from './Components/Login'
+
+export default function NavBar() {
+  return (
+    <div className='w-full px-4 sm:px-10 md:px-20 lg:px-30 2xl:px-60 py-3 flex justify-between items-center'>
+      <Logo/>
+      <Login/>
+    </div>
+  )
+}
