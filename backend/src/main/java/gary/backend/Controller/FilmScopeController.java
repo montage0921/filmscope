@@ -8,18 +8,18 @@ import gary.backend.Entity.Film;
 import gary.backend.Entity.Show;
 import gary.backend.Entity.Theatre;
 import gary.backend.Service.FilmScopeService;
-import jakarta.websocket.server.PathParam;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class FilmScopeController {
     private final FilmScopeService filmScopeService;
 
@@ -47,9 +47,4 @@ public class FilmScopeController {
     public List<FilmDto> getAllFilms() {
         return filmScopeService.getAllFilms();
     }
-    
-    
-    
-    
-    
 }
