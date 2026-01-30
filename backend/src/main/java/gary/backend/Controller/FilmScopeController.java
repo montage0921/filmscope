@@ -2,6 +2,7 @@ package gary.backend.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import gary.backend.DTO.DetailedFilmPageDto;
 import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ShowDescriptionDto;
 import gary.backend.Entity.Film;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
 @AllArgsConstructor
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -24,7 +24,7 @@ public class FilmScopeController {
     private final FilmScopeService filmScopeService;
 
     @GetMapping("/theatres")
-    public List<Theatre> getAllTheatres(){
+    public List<Theatre> getAllTheatres() {
         return filmScopeService.getAllTheatres();
     }
 
@@ -33,8 +33,8 @@ public class FilmScopeController {
         return filmScopeService.getShowById(id);
     }
 
-     @GetMapping("/films/{id}")
-    public Film getFilmById(@PathVariable int id) {
+    @GetMapping("/films/{id}")
+    public DetailedFilmPageDto getFilmById(@PathVariable int id) {
         return filmScopeService.getFilmById(id);
     }
 
