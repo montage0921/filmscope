@@ -1,6 +1,7 @@
 import { type Film } from "../../types";
 import defaultPic from "../../assets/default_film_pic.jpg";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface FilmCardProps {
   film: Film; // This uses your imported Film interface
@@ -10,11 +11,12 @@ export default function FilmCard({ film }: FilmCardProps) {
   const [isHover, setIsHover] = useState(false);
 
   return (
-    <div
+    <Link
       className="bg-[#292929] h-45 rounded-lg overflow-hidden group hover:cursor-pointer flex flex-col 
                     transition-all duration-300 ease-in-out hover:translate-y-0.5 hover:shadow-inner"
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
+      to={`/movie/${film.film_id}`} state={{ title: film.title }}
     >
       <div className="h-[70%] relative">
         <img
@@ -37,6 +39,6 @@ export default function FilmCard({ film }: FilmCardProps) {
         <div className="text-sm">{film.title}</div>
         <div className="text-[10px] text-gray-300">{film.directors}</div>
       </div>
-    </div>
+    </Link>
   );
 }
