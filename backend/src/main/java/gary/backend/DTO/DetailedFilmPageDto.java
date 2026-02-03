@@ -26,6 +26,7 @@ public class DetailedFilmPageDto {
     private String countries;
     private String original_title;
     private String languages;
+    private String plot;
     private List<Genre> genres;
     private Map<String, Map<LocalDate, Map<String, ShowDto>>> showInfoByDate;
 

@@ -61,6 +61,7 @@ public class FilmScopeService {
         String countries = film.getCountries();
         String original_title = film.getOriginal_title();
         String languages = film.getLanguages();
+        String plot = film.getPlot();
         List<Genre> genres = film.getGenres();
 
         List<Show> shows = film.getShows();
@@ -96,7 +97,7 @@ public class FilmScopeService {
 
         return new DetailedFilmPageDto(
                 film_id, title, year, directors, runtime, tconst, poster, backdrop, casts, countries,
-                original_title, languages, genres, showInfoByDate);
+                original_title, languages, plot, genres, showInfoByDate);
     }
 
     // get show description (show_name, theatre, film, earliest_date)

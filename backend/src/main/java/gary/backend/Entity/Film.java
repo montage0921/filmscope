@@ -60,6 +60,9 @@ public class Film {
     @Column(name = "languages")
     private String languages;
 
+    @Column(name = "plot")
+    private String plot;
+
     @ManyToMany(mappedBy = "films")
     @JsonIgnoreProperties("films")
     private List<Show> shows;
