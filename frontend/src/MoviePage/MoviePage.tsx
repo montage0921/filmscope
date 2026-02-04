@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
-import { type DetailedFilmInfo, type Genre } from "../types";
+import { type DetailedFilmInfo} from "../types";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import LoadingDots from "../Utility/LoadingDots";
-import { type TabItem } from "../types";
-import Section from "./Components/Section";
 import Tab from "./Components/Tab";
+import defaultPic from "../assets/default_film_pic.jpg";
+import Showtime from "./Components/Showtime";
 
 export default function MoviePage() {
   const [detailedInfo, setDetailedInfo] = useState<DetailedFilmInfo | null>(
@@ -67,7 +67,11 @@ export default function MoviePage() {
     <div className=" bg-black h-screen flex flex-col items-center">
       <div className="container md:w-1/2 relative">
         <img
-          src={`https://image.tmdb.org/t/p/original${detailedInfo?.backdrop}`}
+          src={
+            detailedInfo?.backdrop
+              ? `https://image.tmdb.org/t/p/original${detailedInfo?.backdrop}`
+              : defaultPic
+          }
         ></img>
         <div className="bg-linear-to-t from-black to-transparent absolute w-full h-20 2xl:h-40 -bottom-2 lg:bottom-0"></div>
 
@@ -80,10 +84,13 @@ export default function MoviePage() {
           </div>
         </div>
       </div>
-      <div className="grid w-1/2 grid-cols-3 2xl:mt-5 md:mt-12">
-        
-        <Tab tabs={Tabs} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
-        <div className="Showtime bg-amber-400 col-span-1">Showtime</div>
+      <div className="grid w-1/2 grid-cols-3 gap-2 2xl:mt-5 md:mt-12">
+        <Tab
+          tabs={Tabs}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+        />
+        <Showtime showInfo={detailedInfo?.showInfoByDate?.show_info || {}}/>
       </div>
     </div>
   );

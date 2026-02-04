@@ -25,6 +25,16 @@ export interface Genre{
     genre:string
 }
 
+export interface ShowInfo {
+  show_id: number;
+  show_title: string;
+  qa_with: string | null;
+  special: string | null;
+  screenings: Screening[];
+}
+
+export type ShowInfoByDate = Record<string, Record<string, ShowInfo>>; // date:{theatre:ShowInfo}
+
 export interface DetailedFilmInfo{
     film_id:number,
     title: string,
@@ -40,8 +50,7 @@ export interface DetailedFilmInfo{
     languages: string,
     plot:string
     genres: Genre[],
-    showInfoBydate:Record<string, Record<string, Record<string, Show>>>
-
+    showInfoByDate:Record<string, ShowInfoByDate> // showinfo:{}
 }
 
 export interface TabItem{
