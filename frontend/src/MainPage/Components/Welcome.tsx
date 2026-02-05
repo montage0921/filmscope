@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function Welcome() {
   return (
     <div className='text-xl font-bold text-center'>
