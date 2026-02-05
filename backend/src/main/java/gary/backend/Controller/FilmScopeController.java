@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @AllArgsConstructor
 @RestController
-@CrossOrigin(origins = { "http://localhost:3000", "https://filmscope-lq18.onrender.com" })
+@CrossOrigin(origins = { "http://localhost:3000", "https://filmscope-lq18.onrender.com", "http://192.168.1.231:3000" })
 public class FilmScopeController {
     private final FilmScopeService filmScopeService;
 
