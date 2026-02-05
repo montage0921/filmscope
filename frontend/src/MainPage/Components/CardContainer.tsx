@@ -9,7 +9,7 @@ export default function CardContainer() {
 
   async function fetchFilms(){
     try{
-        const res = await axios.get("http://localhost:8080/filmscope/films")
+        const res = await axios.get("https://filmscope.onrender.com/filmscope/films")
         setFilms(res.data)
     }catch(error){
         console.error("CORS or Network Error:", error)

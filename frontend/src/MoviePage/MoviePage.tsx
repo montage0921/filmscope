@@ -41,7 +41,7 @@ export default function MoviePage() {
     try {
       setIsLoading(true);
       const res = await axios.get(
-        `http://localhost:8080/filmscope/films/${id}`,
+        `https://filmscope.onrender.com/filmscope/films/${id}`,
       );
       const data = res.data;
       console.log(data);

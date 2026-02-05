@@ -5,7 +5,7 @@ import ScreeningCard from './ScreeningCard';
 
 
 interface ShowTimeProps {
-    showInfo: Record<string, Record<string, ShowInfo>>; 
+    showInfo: Record<string, Record<string, ShowInfo>>;  // date:{theatre:ShowInfo}
 }
 
 export default function Showtime({ showInfo }: ShowTimeProps) {
