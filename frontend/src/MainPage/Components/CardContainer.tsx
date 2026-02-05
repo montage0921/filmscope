@@ -21,7 +21,7 @@ export default function CardContainer() {
   },[])
 
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 justify-center gap-5 gap-x-5'>
+    <div className='grid px-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 justify-center gap-5 gap-x-5'>
       {films.map(film=><FilmCard key={film.film_id} film={film}/>)}
     </div>
   )

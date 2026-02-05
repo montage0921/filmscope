@@ -11,8 +11,8 @@ interface TabProp {
 export default function Tab({tabs, selectedTab, setSelectedTab}:TabProp) {
   return (
     <div className="Tabs col-span-2">
-          <div className="TabName flex justify-evenly mb-1 ">
-            {tabs.map((tab: TabItem, i: number) => (
+          <div className="TabName hidden md:flex justify-evenly mb-1 ">
+            {tabs.filter((tab)=>Object.keys(tab.tabContent).length !== 0 && tab.tabContent.constructor === Object).map((tab: TabItem, i: number) => (
               <span className="w-full font-bold border-b-2 text-center hover:cursor-pointer hover:text-[#ab76f5] hover:border-b-[#ab76f5]" key={i}
               onClick={()=>setSelectedTab(tab.tabName)}>{tab.tabName}</span>
             ))}
