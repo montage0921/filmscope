@@ -41,7 +41,7 @@ export default function MoviePage() {
     try {
       setIsLoading(true);
       const res = await axios.get(
-        `https://filmscope.onrender.com/filmscope/films/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/films/${id}`,
       );
       const data = res.data;
       console.log(data);

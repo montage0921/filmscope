@@ -3,13 +3,12 @@ import { useState, useEffect } from 'react'
 import FilmCard from './FilmCard'
 import { type Film } from '../../types'
 
-
 export default function CardContainer() {
   const [films, setFilms] = useState<Film[]>([])
 
   async function fetchFilms(){
     try{
-        const res = await axios.get("https://filmscope.onrender.com/filmscope/films")
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/films`)
         setFilms(res.data)
     }catch(error){
         console.error("CORS or Network Error:", error)
