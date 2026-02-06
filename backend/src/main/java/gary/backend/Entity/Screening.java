@@ -2,8 +2,10 @@ package gary.backend.Entity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -22,11 +25,11 @@ import lombok.NoArgsConstructor;
 @Data
 
 @Entity
-@Table(name="screenings")
+@Table(name = "screenings")
 public class Screening {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="screening_id")
+    @Column(name = "screening_id")
     private int screening_id;
 
     @ManyToOne
@@ -42,4 +45,8 @@ public class Screening {
 
     @Column(name = "ticket_url")
     private String ticket_url;
+
+    @ManyToMany(mappedBy = "screenings")
+    @JsonIgnoreProperties("screenings")
+    private Set<User> likedBy;
 }

@@ -29,5 +29,6 @@ public class DetailedFilmPageDto {
     private String plot;
     private List<Genre> genres;
     private Map<String, Map<LocalDate, Map<String, ShowDto>>> showInfoByDate;
+    private int likedCnt;
 
 }

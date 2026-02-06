@@ -63,6 +63,7 @@ public class FilmScopeService {
         String languages = film.getLanguages();
         String plot = film.getPlot();
         List<Genre> genres = film.getGenres();
+        int likedCnt = film.getLikedBy().size();
 
         List<Show> shows = film.getShows();
         Map<String, Map<LocalDate, Map<String, ShowDto>>> showInfoByDate = new HashMap<>();
@@ -97,7 +98,7 @@ public class FilmScopeService {
 
         return new DetailedFilmPageDto(
                 film_id, title, year, directors, runtime, tconst, poster, backdrop, casts, countries,
-                original_title, languages, plot, genres, showInfoByDate);
+                original_title, languages, plot, genres, showInfoByDate, likedCnt);
     }
 
     // get show description (show_name, theatre, film, earliest_date)

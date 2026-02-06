@@ -70,4 +70,8 @@ public class Film {
     @ManyToMany(mappedBy = "films")
     private List<Genre> genres;
 
+    @ManyToMany(mappedBy = "films")
+    @JsonIgnoreProperties("films")
+    private List<User> likedBy;
+
 }
