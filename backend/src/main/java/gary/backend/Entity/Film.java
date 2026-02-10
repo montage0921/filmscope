@@ -60,7 +60,7 @@ public class Film {
     @Column(name = "languages")
     private String languages;
 
-    @Column(name = "plot")
+    @Column(name = "plot", columnDefinition = "TEXT")
     private String plot;
 
     @ManyToMany(mappedBy = "films")
