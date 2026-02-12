@@ -1,24 +1,27 @@
 package gary.backend.Service;
 
-import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.message.SimpleMessage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import gary.backend.DTO.LoginDto;
 import gary.backend.DTO.RegisterDto;
 import gary.backend.Entity.User;
 import gary.backend.Entity.UserVerification;
@@ -35,6 +38,7 @@ public class AuthService {
     private final UserVerificationRepository userVerificationRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtEncoder jwtEncoder;
     private final JavaMailSender javaMailSender;
 
     @Value("${app.base-url}")
@@ -108,6 +112,50 @@ public class AuthService {
         userVerificationRepository.delete(uv);
 
         return ResponseEntity.status(HttpStatus.OK).body("Your account is successfully activated!");
+    }
+
+    public ResponseEntity<String> login(LoginDto loginDto) {
+        String email = loginDto.getEmail();
+        String password = loginDto.getPassword();
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        // check if email exists
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No account accocaited with this email: " + email);
+        }
+
+        User user = optionalUser.get();
+
+        // check if password is correct
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password is wrong");
+        }
+
+        // check if the account is activated
+        if (!user.getEnabled()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Your account is not activated");
+        }
+
+        // All good! generate JWT!
+        long expiry = 36000L; // 10 hours in seconds
+        Instant now = Instant.now();
+
+        // get all roles
+        String scopes = user.getAuthorities().stream()
+                .collect(Collectors.joining(" "));
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("filmscope")
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expiry))
+                .subject(user.getEmail())
+                .claim("userId", user.getUser_id())
+                .claim("scope", scopes)
+                .build();
+
+        String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
     private void sendingVerificationLink(String to, String token) {

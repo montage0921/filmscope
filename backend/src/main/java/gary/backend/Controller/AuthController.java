@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
+import gary.backend.DTO.LoginDto;
 import gary.backend.DTO.RegisterDto;
 import gary.backend.Service.AuthService;
 import jakarta.validation.Valid;
@@ -32,6 +33,11 @@ public class AuthController {
     public ResponseEntity<String> getVerify(@PathVariable String token) {
 
         return authService.verify(token);
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto) {
+        return authService.login(loginDto);
     }
 
 }
