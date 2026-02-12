@@ -11,6 +11,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @AllArgsConstructor
 
@@ -23,6 +26,12 @@ public class AuthController {
     @PostMapping("register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto) {
         return authService.register(registerDto);
+    }
+
+    @GetMapping("/verify/{token}")
+    public ResponseEntity<String> getVerify(@PathVariable String token) {
+
+        return authService.verify(token);
     }
 
 }

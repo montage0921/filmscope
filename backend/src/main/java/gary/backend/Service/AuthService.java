@@ -2,13 +2,16 @@ package gary.backend.Service;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Set;
 
 import org.apache.logging.log4j.message.SimpleMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -76,6 +79,35 @@ public class AuthService {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("You registed successfully! Please check your email to verify!");
+    }
+
+    public ResponseEntity<String> verify(String token) {
+
+        UserVerification uv = userVerificationRepository.findByVerificationId(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        // if it doesn't exist
+        if (uv == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("we didn't find the registred account");
+        }
+
+        // check if expired
+        LocalDateTime create_at = uv.getCreatedAt();
+        if (create_at.plusHours(24).isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The verification link is expired");
+        }
+
+        // check if user is already activate
+        User unverfied_user = uv.getUser();
+        if (unverfied_user.getEnabled()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This user is already activated");
+        }
+
+        unverfied_user.setEnabled(true);
+        userRepository.save(unverfied_user);
+        userVerificationRepository.delete(uv);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Your account is successfully activated!");
     }
 
     private void sendingVerificationLink(String to, String token) {
