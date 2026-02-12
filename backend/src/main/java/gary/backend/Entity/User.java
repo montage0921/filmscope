@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +33,9 @@ public class User {
     @Column(name = "user_id")
     private int user_id;
 
+    @Column(name = "username")
+    private String username;
+
     @Column(name = "email")
     private String email;
 
@@ -40,6 +44,10 @@ public class User {
 
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user")
+    private UserVerification userVerification;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
