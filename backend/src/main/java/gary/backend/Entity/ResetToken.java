@@ -21,14 +21,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 @Entity
-@Table(name = "user_verification")
-public class UserVerification {
+@Table(name = "reset_tokens")
+public class ResetToken {
     @Id
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "verification_id", nullable = false, unique = true, length = 200)
-    private String verificationId;
+    @Column(name = "reset_token", nullable = false, unique = true, length = 200)
+    private String resetToken;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -36,6 +36,6 @@ public class UserVerification {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties("resetToken")
+    @JsonIgnoreProperties("reset_token")
     private User user;
 }

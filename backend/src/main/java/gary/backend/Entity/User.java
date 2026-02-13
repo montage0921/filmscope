@@ -49,6 +49,10 @@ public class User {
     @JsonIgnoreProperties("user")
     private UserVerification userVerification;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user")
+    private UserVerification resetToken;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "authority")
