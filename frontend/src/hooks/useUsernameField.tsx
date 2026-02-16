@@ -11,7 +11,7 @@ export function useUserNameField() {
     },
     {
       id: "length",
-      message: "Must be at least 8 characters long",
+      message: "Must be at least 3 characters long",
       valid: false,
     },
   ];
@@ -35,7 +35,7 @@ export function useUserNameField() {
         return { ...constraint, valid: e.target.value.length > 0 };
       }
       if (constraint.id === "length") {
-        return { ...constraint, valid: e.target.value.length >= 8 };
+        return { ...constraint, valid: e.target.value.length >= 3 };
       }
       return constraint;
     });

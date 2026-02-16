@@ -4,10 +4,16 @@ import { usePasswordField } from "../hooks/usePasswordField";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserNameField } from "../hooks/useUsernameField";
 
-export default function LoginForm() {
+type LoginFormProp = {
+  setForm:React.Dispatch<React.SetStateAction<string>>;
+}
+
+export default function LoginForm({setForm}:LoginFormProp) {
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
+
   const { email, emailConstraints, allEmailConstraintsGood, handleEmail } =
     useEmailField();
 
@@ -23,7 +29,7 @@ export default function LoginForm() {
     if (!allEmailConstraintsGood || !allPasswordConstraintsGood) return;
 
     const res = await axios.post(
-      "http://localhost:8080/filmscope/api/auth/login",
+      "http://192.168.1.231:8080/filmscope/api/auth/login",
       { email, password },
       { validateStatus: () => true }, // <- IMPORTANT: never throw
     );
@@ -43,6 +49,7 @@ export default function LoginForm() {
       <p className="font-bold text-xl self-center">Sign In</p>
       {loginError && <p className="text-sm text-red-400">{loginError}</p>}
       <form className="flex flex-col gap-3" onSubmit={handleLogin}>
+
         <Input
           id={"email"}
           labelText="Email"
@@ -68,6 +75,10 @@ export default function LoginForm() {
           Log in
         </button>
       </form>
+      <div className="mt-2 flex justify-between text-[#ab76f5] text-sm font-semibold">
+        <div onClick={()=>setForm("signup")} className="cursor-pointer">Sign Up</div>
+        <div onClick={()=>setForm("forget")} className="cursor-pointer">Forget Password</div>
+      </div>
     </div>
   );
 }

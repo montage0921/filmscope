@@ -59,8 +59,6 @@ public class AuthController {
 
     @PostMapping("/reset")
     public ResponseEntity<String> postMethodName(@RequestBody ResetDto resetDto) {
-        // TODO: process POST request
-
         return authService.reset(resetDto);
     }
 
