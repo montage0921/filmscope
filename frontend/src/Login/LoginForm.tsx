@@ -1,21 +1,16 @@
 import Input from "./Input";
 import { useEmailField } from "../hooks/useEmailField";
-import { useUserNameField } from "../hooks/useUsernameField";
 import { usePasswordField } from "../hooks/usePasswordField";
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
-  
-  const {
-    username,
-    usernameConstraints,
-    allUsernameConstraintsGood,
-    handleUserName,
-  } = useUserNameField();
-
+  const [loginError, setLoginError] = useState("");
+  const navigate = useNavigate();
   const { email, emailConstraints, allEmailConstraintsGood, handleEmail } =
     useEmailField();
 
-  
   const {
     password,
     passwordConstraints,
@@ -23,18 +18,31 @@ export default function LoginForm() {
     handlePassword,
   } = usePasswordField();
 
+  async function handleLogin(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!allEmailConstraintsGood || !allPasswordConstraintsGood) return;
+
+    const res = await axios.post(
+      "http://localhost:8080/filmscope/api/auth/login",
+      { email, password },
+      { validateStatus: () => true }, // <- IMPORTANT: never throw
+    );
+
+    if (res.status === 404 || res.status === 401 || res.status === 403) {
+      setLoginError(res.data);
+      return;
+    }
+
+    const token = res.data;
+    localStorage.setItem("token", token);
+    navigate("/")
+  }
+
   return (
-    <div className=" bg-[#292929] w-[70%] md:w-[20%] py-3 px-3 rounded-sm flex flex-col gap-2">
+    <div className=" bg-[#292929] w-[70%] md:w-[30%] 2xl:w-[20%] py-3 px-3 rounded-sm flex flex-col gap-2">
       <p className="font-bold text-xl self-center">Sign In</p>
-      <form className="flex flex-col gap-3">
-        <Input
-          id={"username"}
-          labelText="Username"
-          onChange={handleUserName}
-          inputValue={username}
-          constraints={usernameConstraints}
-          allConstraintsGood={allUsernameConstraintsGood}
-        />
+      {loginError && <p className="text-sm text-red-400">{loginError}</p>}
+      <form className="flex flex-col gap-3" onSubmit={handleLogin}>
         <Input
           id={"email"}
           labelText="Email"
@@ -53,6 +61,12 @@ export default function LoginForm() {
           allConstraintsGood={allPasswordConstraintsGood}
           inputType="password"
         />
+        <button
+          className="bg-[#ab76f5] rounded-sm text-sm font-semibold h-7 cursor-pointer"
+          type="submit"
+        >
+          Log in
+        </button>
       </form>
     </div>
   );

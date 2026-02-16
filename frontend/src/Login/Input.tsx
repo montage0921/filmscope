@@ -30,7 +30,7 @@ export default function Input({inputType = "text", id, labelText, onChange, inpu
             {constraints.map((constraint) => (
               <li
                 key={constraint.id}
-                className={constraint.valid ? "text-green-400" : "text-red-600"}
+                className={`${constraint.valid ? "text-green-300" : "text-red-400"} text-[10px]`}
               >
                 {constraint.message}
               </li>
