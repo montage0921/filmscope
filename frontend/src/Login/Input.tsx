@@ -1,0 +1,42 @@
+import React from 'react'
+import type { Constraint } from '../types';
+
+type InputProp = {
+    id:string;
+    labelText: string;
+    onChange: (e:React.ChangeEvent<HTMLInputElement>)=>void;
+    inputValue:string;
+    allConstraintsGood:boolean;
+    constraints:Constraint[];
+    inputType?:string
+
+}
+
+export default function Input({inputType = "text", id, labelText, onChange, inputValue, allConstraintsGood, constraints}:InputProp) {
+  return (
+    <div className="flex flex-col text-gray-300">
+        <label htmlFor={id} className="text-[12px]">
+          {labelText}
+        </label>
+        <input
+          type={inputType}
+          className="bg-[#1a1a1a] text-sm px-2 py-1 rounded focus:outline-none focus:border focus:border-[#ab76f5]"
+          id={id}
+          value={inputValue}
+          onChange={(e) => onChange(e)}
+        />
+        {!allConstraintsGood && (
+          <ul className="mt-1 text-sm list-disc pl-4">
+            {constraints.map((constraint) => (
+              <li
+                key={constraint.id}
+                className={constraint.valid ? "text-green-400" : "text-red-600"}
+              >
+                {constraint.message}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+  )
+}
