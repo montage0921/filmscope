@@ -2,6 +2,7 @@ import { useState } from "react";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 import SignUpVerification from "./SignUpVerification";
+import ForgetPasswordForm from "./ForgetPasswordForm";
 
 export default function LoginOverlay() {
   const [curForm, setCurForm] = useState("login")
@@ -10,6 +11,7 @@ export default function LoginOverlay() {
       {curForm === "login" && <LoginForm setForm={setCurForm}/>}
       {curForm === "signup" && <SignUpForm setForm={setCurForm}/>}
       {curForm === "verify" && <SignUpVerification setForm={setCurForm}/>}
+      {curForm === "forget" && <ForgetPasswordForm setForm = {setCurForm}/>}
     </div>
   )
 }

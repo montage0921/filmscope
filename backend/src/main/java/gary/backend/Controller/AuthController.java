@@ -37,6 +37,16 @@ public class AuthController {
         return authService.verify(token);
     }
 
+    @PostMapping("login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
+        return authService.login(loginDto);
+    }
+
+    @PostMapping("/forgetpassword")
+    public ResponseEntity<String> forgetPassword(@RequestParam String email) {
+        return authService.sendResetLink(email);
+    }
+
     @GetMapping("/reset/{token}")
     public ResponseEntity<Void> clickResetLink(@PathVariable String token) {
         return authService.clickResetLink(token);
@@ -46,16 +56,6 @@ public class AuthController {
     @GetMapping("/reset-info")
     public ResponseEntity<?> resetInfo(@RequestParam String token) {
         return authService.resetInfo(token);
-    }
-
-    @PostMapping("login")
-    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
-        return authService.login(loginDto);
-    }
-
-    @PostMapping("/forgetPassword")
-    public ResponseEntity<String> forgetPassword(@RequestParam String email) {
-        return authService.sendResetLink(email);
     }
 
     @PostMapping("/reset")

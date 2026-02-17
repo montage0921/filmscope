@@ -83,7 +83,8 @@ public class AuthConfig {
                 .requestMatchers(HttpMethod.GET, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST,
                         "/api/auth/register", "/api/auth/login",
-                        "/filmscope/api/auth/register", "/filmscope/api/auth/login")
+                        "/filmscope/api/auth/register", "/filmscope/api/auth/login", "/api/auth/forgetpassword",
+                        "/filmscope/api/auth/forgetpassword", "/filmscope/api/auth/reset", "/api/auth/reset")
                 .permitAll()
                 .anyRequest().hasAuthority("SCOPE_ROLE_ADMIN"))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

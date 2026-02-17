@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import UserNav from "../../Login/UserNav";
+import UserNav from "../../Auth/UserNav";
 
 export default function LoginButton() {
   const { user } = useAuth();
