@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = { "http://localhost:3000", "https://filmscope-lq18.onrender.com", "http://192.168.1.231:3000" })
+@CrossOrigin(origins = { "http://localhost:3000", "https://filmscope-lq18.onrender.com", "http://192.168.1.231:3000",
+        "https://filmscope.onrender.com" })
 public class AuthController {
     private final AuthService authService;
 
