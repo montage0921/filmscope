@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import gary.backend.DTO.LoginDto;
+import gary.backend.DTO.LoginResponseDto;
 import gary.backend.DTO.RegisterDto;
 import gary.backend.DTO.ResetDto;
 import gary.backend.Service.AuthService;
@@ -36,6 +37,16 @@ public class AuthController {
         return authService.verify(token);
     }
 
+    @PostMapping("login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
+        return authService.login(loginDto);
+    }
+
+    @PostMapping("/forgetpassword")
+    public ResponseEntity<String> forgetPassword(@RequestParam String email) {
+        return authService.sendResetLink(email);
+    }
+
     @GetMapping("/reset/{token}")
     public ResponseEntity<Void> clickResetLink(@PathVariable String token) {
         return authService.clickResetLink(token);
@@ -47,20 +58,8 @@ public class AuthController {
         return authService.resetInfo(token);
     }
 
-    @PostMapping("login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto) {
-        return authService.login(loginDto);
-    }
-
-    @PostMapping("/forgetPassword")
-    public ResponseEntity<String> forgetPassword(@RequestParam String email) {
-        return authService.sendResetLink(email);
-    }
-
     @PostMapping("/reset")
     public ResponseEntity<String> postMethodName(@RequestBody ResetDto resetDto) {
-        // TODO: process POST request
-
         return authService.reset(resetDto);
     }
 

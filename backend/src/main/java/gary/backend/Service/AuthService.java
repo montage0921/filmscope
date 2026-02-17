@@ -22,8 +22,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import gary.backend.DTO.LoginDto;
+import gary.backend.DTO.LoginResponseDto;
 import gary.backend.DTO.RegisterDto;
 import gary.backend.DTO.ResetDto;
+import gary.backend.DTO.UserDto;
 import gary.backend.Entity.ResetToken;
 import gary.backend.Entity.User;
 import gary.backend.Entity.UserVerification;
@@ -121,26 +123,31 @@ public class AuthService {
         return ResponseEntity.status(HttpStatus.OK).body("Your account is successfully activated!");
     }
 
-    public ResponseEntity<String> login(LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDto> login(LoginDto loginDto) {
         String email = loginDto.getEmail();
         String password = loginDto.getPassword();
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
+        LoginResponseDto loginResponseDto = new LoginResponseDto();
+
         // check if email exists
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No account accocaited with this email: " + email);
+            loginResponseDto.setErrorMessage("No account accocaited with this email: " + email);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(loginResponseDto);
         }
 
         User user = optionalUser.get();
 
         // check if password is correct
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password is wrong");
+            loginResponseDto.setErrorMessage("Password is wrong");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(loginResponseDto);
         }
 
         // check if the account is activated
         if (!user.getEnabled()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Your account is not activated");
+            loginResponseDto.setErrorMessage("Your account is not activated");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(loginResponseDto);
         }
 
         // All good! generate JWT!
@@ -162,7 +169,20 @@ public class AuthService {
 
         String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
-        return ResponseEntity.status(HttpStatus.OK).body(token);
+        loginResponseDto.setToken(token);
+
+        UserDto userDto = new UserDto();
+        userDto.setUser_id(user.getUser_id());
+        userDto.setUsername(user.getUsername());
+        userDto.setEmail(user.getEmail());
+        userDto.setAuthorities(user.getAuthorities());
+        userDto.setEnabled(user.getEnabled());
+        userDto.setFilms(user.getFilms());
+        userDto.setScreenings(user.getScreenings());
+
+        loginResponseDto.setUserDto(userDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
 
     }
 

@@ -28,8 +28,8 @@ function StyleSheet() {
             }
 
             .dot {
-                width: 20px;
-                height: 20px;
+                width: 10px;
+                height: 10px;
                 border-radius: 50%;
                 background-color: #ab76f5;
                 will-change: transform;

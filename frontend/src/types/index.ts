@@ -57,3 +57,9 @@ export interface TabItem{
     tabName:string,
     tabContent:Object
 }
+
+export type Constraint = {
+  id: string;
+  message: string;
+  valid: boolean;
+};

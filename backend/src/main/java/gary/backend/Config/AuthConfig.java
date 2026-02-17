@@ -2,6 +2,7 @@ package gary.backend.Config;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,9 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -55,17 +59,37 @@ public class AuthConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // Enable CORS
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://filmscope-lq18.onrender.com",
+                "http://192.168.1.231:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true); // only if you use cookies/auth
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     // specify authorizaiton for each http request
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(configurer -> configurer
-                        .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
-                        .anyRequest().hasAuthority("SCOPE_ROLE_ADMIN"))
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())) // enable JWT verify
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // disable
-                                                                                                              // session
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                .requestMatchers(HttpMethod.POST,
+                        "/api/auth/register", "/api/auth/login",
+                        "/filmscope/api/auth/register", "/filmscope/api/auth/login", "/api/auth/forgetpassword",
+                        "/filmscope/api/auth/forgetpassword", "/filmscope/api/auth/reset", "/api/auth/reset")
+                .permitAll()
+                .anyRequest().hasAuthority("SCOPE_ROLE_ADMIN"))
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
