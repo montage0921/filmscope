@@ -18,7 +18,7 @@ export default function ResetPassword() {
   useEffect(function () {
     const getMaskedEmail = async () => {
       const res = await axios.get(
-        "http://192.168.1.231:8080/filmscope/api/auth/reset-info",
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/auth/reset-info`,
         { params: { token: token }, validateStatus: () => true }, // <- IMPORTANT: never throw
       );
 

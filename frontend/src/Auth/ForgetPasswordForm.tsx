@@ -20,7 +20,7 @@ export default function ForgetPasswordForm({
 
     if (!allEmailConstraintsGood) return;
     const res = await axios.post(
-      "http://192.168.1.231:8080/filmscope/api/auth/forgetpassword",
+      `${import.meta.env.VITE_BACKEND_BASE_URL}/api/auth/forgetpassword`,
       null,
       {
         params: { email: email },

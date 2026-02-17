@@ -32,7 +32,7 @@ export default function LoginForm({setForm}:LoginFormProp) {
 
     if (!allEmailConstraintsGood || !allPasswordConstraintsGood) return;
     const res = await axios.post(
-      "http://192.168.1.231:8080/filmscope/api/auth/login",
+      `${import.meta.env.VITE_BACKEND_BASE_URL}/api/auth/login`,
       { email, password },
       { validateStatus: () => true }, // <- IMPORTANT: never throw
     );

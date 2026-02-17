@@ -46,7 +46,7 @@ export default function SignUpForm({ setForm }: SignUpFormProps) {
 
     setIsloading(true)
     const res = await axios.post(
-      "http://192.168.1.231:8080/filmscope/api/auth/register",
+       `${import.meta.env.VITE_BACKEND_BASE_URL}/api/auth/register`,
       { username, email, password },
       { validateStatus: () => true }, // <- IMPORTANT: never throw
     );

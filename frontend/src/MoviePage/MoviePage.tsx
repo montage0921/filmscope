@@ -49,7 +49,7 @@ export default function MoviePage() {
     try {
       setIsLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/films/${id}`,
+        `${import.meta.env.VITE_BACKEND_BASE_UR}/films/${id}`,
       );
       setDetailedInfo(res.data);
       setIsLoading(false);
