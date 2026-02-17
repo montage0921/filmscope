@@ -4,7 +4,7 @@ import { usePasswordField } from "../hooks/usePasswordField";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserNameField } from "../hooks/useUsernameField";
+import { useAuth } from "../context/AuthContext";
 
 type LoginFormProp = {
   setForm:React.Dispatch<React.SetStateAction<string>>;
@@ -24,10 +24,13 @@ export default function LoginForm({setForm}:LoginFormProp) {
     handlePassword,
   } = usePasswordField();
 
+  const {login} = useAuth();
+
   async function handleLogin(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!allEmailConstraintsGood || !allPasswordConstraintsGood) return;
+    setLoginError('')
 
+    if (!allEmailConstraintsGood || !allPasswordConstraintsGood) return;
     const res = await axios.post(
       "http://192.168.1.231:8080/filmscope/api/auth/login",
       { email, password },
@@ -35,12 +38,13 @@ export default function LoginForm({setForm}:LoginFormProp) {
     );
 
     if (res.status === 404 || res.status === 401 || res.status === 403) {
-      setLoginError(res.data);
+      setLoginError(res.data.errorMessage);
       return;
     }
 
-    const token = res.data;
-    localStorage.setItem("token", token);
+    const token = res.data.token;
+    const userDto = res.data.userDto;
+    login(userDto, token)
     navigate("/")
   }
 

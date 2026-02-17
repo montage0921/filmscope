@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import gary.backend.DTO.LoginDto;
+import gary.backend.DTO.LoginResponseDto;
 import gary.backend.DTO.RegisterDto;
 import gary.backend.DTO.ResetDto;
 import gary.backend.Service.AuthService;
@@ -48,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
         return authService.login(loginDto);
     }
 

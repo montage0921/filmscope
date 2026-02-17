@@ -41,6 +41,7 @@ export default function SignUpForm({ setForm }: SignUpFormProps) {
 
   async function handleSignUp(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoginError('')
     if (!allUsernameConstraintsGood || !allEmailConstraintsGood || !allPasswordConstraintsGood || !allConfirmedPwdConstraintsGood) return;
 
     setIsloading(true)
