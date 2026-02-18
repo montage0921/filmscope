@@ -8,7 +8,7 @@ export default function CardContainer() {
 
   async function fetchFilms(){
     try{
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/films`)
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/films`)
         setFilms(res.data)
     }catch(error){
         console.error("CORS or Network Error:", error)

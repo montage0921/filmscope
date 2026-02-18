@@ -28,8 +28,10 @@ export default function ForgetPasswordForm({
       }, // <- IMPORTANT: never throw
     );
 
+    console.log(res)
+
     if (res.status === 404 || res.status === 401) {
-      setLoginError(res.data.errorMessage);
+      setLoginError(res.data);
       return;
     }
 

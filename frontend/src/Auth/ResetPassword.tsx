@@ -46,6 +46,7 @@ export default function ResetPassword() {
   async function handleReset(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoginError("");
+    setSucessMessage("")
     if (!allPasswordConstraintsGood || !allConfirmedPwdConstraintsGood) return;
 
     setIsloading(true)
@@ -58,7 +59,7 @@ export default function ResetPassword() {
     if (res.status === 202) {
       setSucessMessage(res.data)
     }else{
-        setLoginError(res.data.errorMessage)
+      setLoginError(res.data.errorMessage)
     }
 
     setIsloading(false)

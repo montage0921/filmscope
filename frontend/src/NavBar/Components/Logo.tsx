@@ -1,9 +1,10 @@
+import { Link } from "react-router-dom";
 
 
 export default function Logo() {
   return (
-    <div className='text-xl font-extrabold'>
+    <Link to="/" className='text-xl font-extrabold'>
       FilmScope Toronto
-    </div>
+    </Link>
   )
 }
