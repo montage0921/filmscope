@@ -7,6 +7,8 @@ import Tab from "./Components/Tab";
 import defaultPic from "../assets/default_film_pic.jpg";
 import Showtime from "./Components/Showtime";
 import useWindowSize from "../hooks/useWindowSize";
+import { useAuth } from "../context/AuthContext";
+import EditOverlay from "./EditFilm/EditOverlay";
 
 export default function MoviePage() {
   const [detailedInfo, setDetailedInfo] = useState<DetailedFilmInfo | null>(
@@ -14,10 +16,13 @@ export default function MoviePage() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Details");
+  const [isEditClick, setIsEditClick] = useState(false);
   const { id } = useParams();
 
   const windowSize = useWindowSize();
   const mdThreshold = 768;
+
+  const { is_admin } = useAuth();
 
   const Tabs = [
     {
@@ -73,6 +78,7 @@ export default function MoviePage() {
   return (
     /* Use min-h-dvh to prevent iPhone browser UI from cutting off the bottom */
     <div className="bg-black min-h-dvh flex flex-col items-center text-white pb-10">
+      {isEditClick && <EditOverlay filmInfo={detailedInfo}/>}
       {/* Poster Section */}
       <div className="container w-full md:w-1/2 relative">
         <img
@@ -89,9 +95,21 @@ export default function MoviePage() {
 
         {/* Title and Director Overlay */}
         <div className="absolute top-[75%] px-3 flex flex-col gap-1">
-          <div className="font-extrabold text-3xl md:text-4xl">
-            {detailedInfo?.title}
+          <div className="flex gap-10">
+            <div className="font-extrabold text-3xl md:text-4xl">
+              {detailedInfo?.title}
+            </div>
+
+            {is_admin && (
+              <button
+                className="bg-[#ab76f5] text-sm min-w-15 px-2 font-bold rounded-md cursor-pointer"
+                onClick={() => setIsEditClick(true)}
+              >
+                Edit
+              </button>
+            )}
           </div>
+
           <div className="font-bold text-lg">{detailedInfo?.director}</div>
           <div className="font-light text-sm flex gap-5 text-gray-300">
             <span>{detailedInfo?.runtime}min</span>
@@ -118,13 +136,15 @@ export default function MoviePage() {
       <div className="w-full px-4 md:w-1/2 mt-5 md:mt-1">
         {/* Layout Container: Stacked on mobile, Grid on desktop */}
         <div className="md:grid md:grid-cols-3 gap-6">
-          {(selectedTab !== "Showtimes" || windowSize >= mdThreshold) && <div className="md:col-span-2">
-            <Tab
-              tabs={Tabs}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            />
-          </div>}
+          {(selectedTab !== "Showtimes" || windowSize >= mdThreshold) && (
+            <div className="md:col-span-2">
+              <Tab
+                tabs={Tabs}
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+              />
+            </div>
+          )}
 
           {(selectedTab === "Showtimes" || windowSize >= mdThreshold) && (
             <div className="md:col-span-1">
