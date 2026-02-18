@@ -50,7 +50,7 @@ export default function ResetPassword() {
 
     setIsloading(true)
     const res = await axios.post(
-      "http://192.168.1.231:8080/filmscope/api/auth/reset",
+      `${import.meta.env.VITE_BACKEND_BASE_URL}/api/auth/reset`,
       { token, password },
       { validateStatus: () => true }, // <- IMPORTANT: never throw
     );
