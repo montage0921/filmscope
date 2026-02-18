@@ -65,10 +65,10 @@ export default function EditOverlay({ filmInfo }: EditOverLayProps) {
     usePlotField(filmInfo?.plot || "");
 
   return (
-    <div className="fixed inset-0 z-30 flex justify-center items-center bg-black/80">
-      <div className="bg-[#292929] p-3 flex flex-col items-center min-w-[80%] 2xl:min-w-[30%]">
+    <div className="fixed inset-0 z-9999 flex justify-center items-center bg-black/80">
+      <div className="bg-[#292929] p-3 flex flex-col gap-3 items-center min-w-[70%] 2xl:min-w-[30%] max-h-[70%] overflow-y-auto">
         <h2 className="font-bold text-xl">Edit Film Info</h2>
-        <div className="flex flex-col lg:flex-row gap-3 mb-1">
+
           <Input
             id={"title"}
             labelText="Title"
@@ -85,8 +85,8 @@ export default function EditOverlay({ filmInfo }: EditOverLayProps) {
             constraints={originalTitleConstraints}
             allConstraintsGood={allOriginalTitleConstraintsGood}
           />
-        </div>
-        <div className="flex flex-col lg:flex-row gap-3 mb-1">
+
+
           <Input
             id={"director"}
             labelText="Director"
@@ -103,8 +103,8 @@ export default function EditOverlay({ filmInfo }: EditOverLayProps) {
             constraints={castsConstraints}
             allConstraintsGood={allCastsConstraintsGood}
           />
-        </div>
-        <div className="flex flex-col lg:flex-row gap-3 mb-1">
+
+
           <Input
             id={"runtime"}
             labelText="Runtime (mins)"
@@ -121,8 +121,8 @@ export default function EditOverlay({ filmInfo }: EditOverLayProps) {
             constraints={yearConstraints}
             allConstraintsGood={allYearConstraintsGood}
           />
-        </div>
-        <div className="flex flex-col lg:flex-row gap-3 mb-1">
+
+      
           <Input
             id={"countries"}
             labelText="Countries"
@@ -139,7 +139,7 @@ export default function EditOverlay({ filmInfo }: EditOverLayProps) {
             constraints={languagesConstraints}
             allConstraintsGood={allLanguagesConstraintsGood}
           />
-        </div>
+
         <Input
           id={"poster"}
           labelText="Poster URL"

@@ -14,7 +14,7 @@ type InputProp = {
 
 export default function Input({inputType = "text", id, labelText, onChange, inputValue, allConstraintsGood, constraints}:InputProp) {
   return (
-    <div className="flex flex-col text-gray-300 min-w-[50%]">
+    <div className="flex flex-col text-gray-300 min-w-[80%]">
         <label htmlFor={id} className="text-[12px]">
           {labelText}
         </label>
