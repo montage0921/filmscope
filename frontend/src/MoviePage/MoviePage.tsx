@@ -78,7 +78,7 @@ export default function MoviePage() {
   return (
     /* Use min-h-dvh to prevent iPhone browser UI from cutting off the bottom */
     <div className="bg-black min-h-dvh flex flex-col items-center text-white pb-10">
-      {isEditClick && <EditOverlay filmInfo={detailedInfo}/>}
+      {isEditClick && <EditOverlay filmInfo={detailedInfo} toggleEdit={setIsEditClick}/>}
       {/* Poster Section */}
       <div className="container w-full md:w-1/2 relative">
         <img
