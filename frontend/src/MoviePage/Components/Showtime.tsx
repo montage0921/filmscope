@@ -1,46 +1,38 @@
-import HoverLabel from '../../Utility/HoverLabel';
-import type { Screening, ShowInfo, Theatre } from '../../types';
-import { Mic, Star } from 'lucide-react';
-import ScreeningCard from './ScreeningCard';
-import { useEffect, useState } from 'react';
-import axios, { all } from 'axios';
-
+import HoverLabel from "../../Utility/HoverLabel";
+import type { Screening, ShowInfo } from "../../types";
+import { Mic, Star } from "lucide-react";
+import ScreeningCard from "./ScreeningCard";
+import { Link } from "react-router-dom";
 
 interface ShowTimeProps {
-    showInfo: Record<string, Record<string, ShowInfo>>;  // date:{theatre:ShowInfo}
+  showInfo: Record<string, Record<string, ShowInfo>>; // date:{theatre:ShowInfo}
+  film_id: number
 }
 
-export default function Showtime({ showInfo }: ShowTimeProps) {
-  const [allTheatres, setAllTheatres] = useState<Theatre[]>([]);
-    useEffect(function(){
-    async function getAllTheatres(){
-      try{
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/theatres`)
-        console.log(res.data)
-        setAllTheatres(res.data);
-      }catch(error){
-        console.log("Failed to get all theatres info")
-      }
-    }
-
-    getAllTheatres()
-  },[])
-
+export default function Showtime({ showInfo, film_id }: ShowTimeProps) {
   return (
     <div className="Showtime col-span-1 text-center text-gray-300">
-      <div className="w-full font-medium border-b-2 text-center mb-2 border-gray-700">
+      <div className="w-full font-medium border-b-2 text-center mb-2 border-gray-700 p-1">
         Showtimes
+        <Link
+          className="bg-[#ab76f5] text-sm  font-semibold p-1 rounded-md cursor-pointer ml-2"
+           to={`/edit-show/${film_id}`} 
+        >
+          Edit Shows
+        </Link>
       </div>
       <div>
         {/*1. first iteration layer: date */}
-        {(Object.entries(showInfo || {}) as [string, Record<string, ShowInfo>][])
+        {(
+          Object.entries(showInfo || {}) as [string, Record<string, ShowInfo>][]
+        )
           .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
           .map(([date, theatres], _) => {
             const formattedDate = new Date(date).toLocaleDateString("en-US", {
               weekday: "short",
               month: "short",
               day: "numeric",
-              timeZone: "UTC"
+              timeZone: "UTC",
             });
 
             return (
@@ -48,7 +40,9 @@ export default function Showtime({ showInfo }: ShowTimeProps) {
                 {/* Date */}
                 <div className="Date flex items-center gap-2 text-sm mb-3">
                   <div className="grow border-t border-gray-600"></div>
-                  <span className="text-gray-400 font-mono">{formattedDate}</span>
+                  <span className="text-gray-400 font-mono">
+                    {formattedDate}
+                  </span>
                   <div className="grow border-t border-gray-600"></div>
                 </div>
 
@@ -56,7 +50,10 @@ export default function Showtime({ showInfo }: ShowTimeProps) {
                   {/* 2. Second Iteration Layer: Theatre under one Date*/}
                   {(Object.entries(theatres) as [string, ShowInfo][]).map(
                     ([theatre, detailShowInfo]) => (
-                      <div key={detailShowInfo?.show_id} className="ScreeningsContainer flex flex-col gap-2 mb-4">
+                      <div
+                        key={detailShowInfo?.show_id}
+                        className="ScreeningsContainer flex flex-col gap-2 mb-4"
+                      >
                         {/* Theatre Name + QA/Special Label */}
                         <div className="Show text-[12px] flex items-center gap-1 px-4 text-gray-400">
                           <span className="font-bold">{theatre}</span>
@@ -81,20 +78,18 @@ export default function Showtime({ showInfo }: ShowTimeProps) {
                           {detailShowInfo?.screenings
                             ?.slice()
                             .sort((a: Screening, b: Screening) =>
-                              a.start_time.localeCompare(b.start_time)
+                              a.start_time.localeCompare(b.start_time),
                             )
                             .map((screen: Screening) => (
                               <ScreeningCard
                                 key={screen.screening_id}
                                 screen={screen}
                                 theatre={theatre}
-                                screening_date={date}
-                                allTheatres={allTheatres}
                               />
                             ))}
                         </div>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -102,5 +97,5 @@ export default function Showtime({ showInfo }: ShowTimeProps) {
           })}
       </div>
     </div>
-  )
+  );
 }

@@ -4,6 +4,7 @@ import NavBar from "./NavBar/NavBar"
 import MoviePage from "./MoviePage/MoviePage"
 import LoginOverlay from "./Auth/LoginOverlay"
 import ResetPassword from "./Auth/ResetPassword"
+import ShowEditTable from "./ShowEditPage/ShowEditTable"
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
         <Route path = "/movie/:id" element={<MoviePage/>}/>
         <Route path = "/login" element={<LoginOverlay/>}/>
         <Route path = "/reset-password" element={<ResetPassword/>}/>
+        <Route path = "/edit-show/:id" element={<ShowEditTable/>}/>
       </Routes>
     </BrowserRouter>
   )

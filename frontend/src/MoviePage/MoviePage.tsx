@@ -157,6 +157,7 @@ export default function MoviePage() {
             <div className="md:col-span-1">
               <Showtime
                 showInfo={detailedInfo?.showInfoByDate?.show_info || {}}
+                film_id={detailedInfo?.film_id || -1}
               />
             </div>
           )}
