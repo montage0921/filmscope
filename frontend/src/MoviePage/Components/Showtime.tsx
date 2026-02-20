@@ -23,6 +23,7 @@ export default function Showtime({ showInfo }: ShowTimeProps) {
               weekday: "short",
               month: "short",
               day: "numeric",
+              timeZone: "UTC"
             });
 
             return (
@@ -70,6 +71,7 @@ export default function Showtime({ showInfo }: ShowTimeProps) {
                                 key={screen.screening_id}
                                 screen={screen}
                                 theatre={theatre}
+                                screening_date={date}
                               />
                             ))}
                         </div>
