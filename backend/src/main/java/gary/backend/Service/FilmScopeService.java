@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import gary.backend.DTO.DetailedFilmPageDto;
@@ -21,6 +22,7 @@ import gary.backend.Entity.Screening;
 import gary.backend.Entity.Show;
 import gary.backend.Entity.Theatre;
 import gary.backend.Repository.FilmRepository;
+import gary.backend.Repository.GenreRepository;
 import gary.backend.Repository.ShowRepository;
 import gary.backend.Repository.TheatreRepository;
 import lombok.AllArgsConstructor;
@@ -32,6 +34,7 @@ public class FilmScopeService {
     private final TheatreRepository theatreRepository;
     private final ShowRepository showRepository;
     private final FilmRepository filmRepository;
+    private final GenreRepository genreRepository;
 
     // for testing
     public List<Theatre> getAllTheatres() {
@@ -126,6 +129,64 @@ public class FilmScopeService {
                     (String) item[3],
                     genresList);
         }).toList();
+    }
+
+    public List<Genre> getAllGenres() {
+        return genreRepository.findAll();
+    }
+
+    // update basic film info (except genres)
+    public ResponseEntity<String> updateFilmInfo(int film_id, Map<String, String> updated) {
+        Film film = filmRepository.findById(film_id).orElseThrow(() -> new RuntimeException("Film not found"));
+        updated.forEach((key, value) -> {
+            switch (key) {
+                case "title":
+                    film.setTitle(value);
+                    break;
+                case "year":
+                    film.setYear(Integer.valueOf(value));
+                    break;
+                case "director":
+                    film.setDirector(value);
+                    break;
+                case "runtime":
+                    film.setRuntime(Integer.valueOf(value));
+                    break;
+                case "tconst":
+                    film.setTconst(value);
+                    break;
+                case "poster":
+                    film.setPoster(value);
+                    break;
+                case "backdrop":
+                    film.setBackdrop(value);
+                    break;
+                case "casts":
+                    film.setCasts(value);
+                    break;
+                case "countries":
+                    film.setCountries(value);
+                    break;
+                case "languages":
+                    film.setLanguages(value);
+                    break;
+                case "plot":
+                    film.setPlot(value);
+                    break;
+                case "original_title":
+                    film.setOriginal_title(value);
+            }
+        });
+        filmRepository.save(film);
+        return ResponseEntity.ok("Movie info has been successfully updated🎉");
+    }
+
+    public ResponseEntity<String> updateFilmGenre(int film_id, List<Genre> genres) {
+        Film film = filmRepository.findById(film_id).orElseThrow(() -> new RuntimeException("Film not found"));
+        film.setGenres(genres);
+        filmRepository.save(film);
+
+        return ResponseEntity.ok("Movie Genre has been successfully updated!");
     }
 
 }

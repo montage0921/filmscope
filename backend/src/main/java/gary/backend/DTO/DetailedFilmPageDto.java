@@ -30,5 +30,4 @@ public class DetailedFilmPageDto {
     private List<Genre> genres;
     private Map<String, Map<LocalDate, Map<String, ShowDto>>> showInfoByDate;
     private int likedCnt;
-
 }

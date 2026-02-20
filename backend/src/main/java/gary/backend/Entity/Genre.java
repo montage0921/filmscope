@@ -27,17 +27,13 @@ public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "genre_id")
-    private int genere_id;
+    private int genre_id;
 
     @Column(name = "genre")
     private String genre;
 
     @ManyToMany
-    @JoinTable(
-        name = "genre_film",
-        joinColumns = @JoinColumn(name = "genre_id"),
-        inverseJoinColumns = @JoinColumn(name = "film_id")
-    )
+    @JoinTable(name = "genre_film", joinColumns = @JoinColumn(name = "genre_id"), inverseJoinColumns = @JoinColumn(name = "film_id"))
     @JsonIgnore
     private Set<Film> films;
 

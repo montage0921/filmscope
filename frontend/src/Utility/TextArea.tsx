@@ -36,7 +36,6 @@ export default function TextArea({ id, labelText, onChange, inputValue, allConst
             ))}
           </ul>
         )}
-        <textarea/>
       </div>
   )
 }

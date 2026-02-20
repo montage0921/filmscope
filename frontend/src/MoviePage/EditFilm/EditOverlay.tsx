@@ -1,8 +1,9 @@
+import { useState } from "react";
 import Input from "../../Auth/Input";
 import type { BasicFilmInfo, DetailedFilmInfo } from "../../types";
+import GenreLabels from "../../Utility/GenreLabels";
 import TextArea from "../../Utility/TextArea";
 import { useEditForm } from "./hooks/useFilmEditForm";
-
 
 type EditOverLayProps = {
   filmInfo: DetailedFilmInfo | null;
@@ -29,10 +30,33 @@ export default function EditOverlay({
 
   const { filmForm, handleChange, getConstraints, checkIfAllGood } =
     useEditForm(initialEditableFilmInfo);
+  const [allGenres, setAllGenres] = useState(filmInfo?.genres);
+  const [updated, setUpdated] = useState(new Map());
+
+  function handleUpdate(key: keyof BasicFilmInfo, val: string) {
+    let oldValue = undefined;
+    if (filmInfo) {
+      oldValue = filmInfo[key];
+    }
+
+    let newVal = undefined;
+    if (key === "runtime") newVal = Number(val);
+    else if (key === "year") newVal = Number(val);
+    else newVal = val;
+
+    handleChange(key, newVal);
+    const copy = new Map(updated);
+    if (newVal === oldValue) {
+      if (copy.has(key)) copy.delete(key);
+    } else {
+      copy.set(key, newVal);
+    }
+    setUpdated(copy);
+  }
 
   return (
     <div className="fixed inset-0 z-9999 flex justify-center items-center bg-black/80">
-      <div className="bg-[#292929] p-3 flex flex-col gap-3 items-center min-w-[70%] 2xl:min-w-[30%] max-h-[70%] overflow-y-auto">
+      <div className="bg-[#292929] p-3 flex flex-col gap-3 items-center w-[70%] 2xl:w-[30%]  max-h-[70%] overflow-y-auto">
         <h2 className="font-bold text-xl">Edit Film Info</h2>
         <div className="flex gap-3">
           <button className="bg-[#ab76f5]  text-sm  font-semibold p-1 rounded-md cursor-pointer">
@@ -50,7 +74,7 @@ export default function EditOverlay({
           id="title"
           labelText="Title"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleChange("title", e.target.value)
+            handleUpdate("title", e.target.value)
           }
           inputValue={filmForm.title}
           constraints={getConstraints("title", filmForm.title)}
@@ -59,7 +83,7 @@ export default function EditOverlay({
         <Input
           id="original_title"
           labelText="Original Title"
-          onChange={(e) => handleChange("original_title", e.target.value)}
+          onChange={(e) => handleUpdate("original_title", e.target.value)}
           inputValue={filmForm.original_title}
           constraints={getConstraints(
             "original_title",
@@ -71,7 +95,7 @@ export default function EditOverlay({
         <Input
           id="director"
           labelText="Director"
-          onChange={(e) => handleChange("director", e.target.value)}
+          onChange={(e) => handleUpdate("director", e.target.value)}
           inputValue={filmForm.director}
           constraints={getConstraints("director", filmForm.director)}
           allConstraintsGood={checkIfAllGood("director")}
@@ -80,7 +104,7 @@ export default function EditOverlay({
         <Input
           id="casts"
           labelText="Casts"
-          onChange={(e) => handleChange("casts", e.target.value)}
+          onChange={(e) => handleUpdate("casts", e.target.value)}
           inputValue={filmForm.casts}
           constraints={getConstraints("casts", filmForm.casts)}
           allConstraintsGood={checkIfAllGood("casts")}
@@ -89,7 +113,7 @@ export default function EditOverlay({
         <Input
           id="runtime"
           labelText="Runtime (mins)"
-          onChange={(e) => handleChange("runtime", e.target.value)}
+          onChange={(e) => handleUpdate("runtime", e.target.value)}
           inputValue={String(filmForm.runtime)}
           constraints={getConstraints("runtime", filmForm.runtime)}
           allConstraintsGood={checkIfAllGood("runtime")}
@@ -98,7 +122,7 @@ export default function EditOverlay({
         <Input
           id="year"
           labelText="Year"
-          onChange={(e) => handleChange("year", e.target.value)}
+          onChange={(e) => handleUpdate("year", e.target.value)}
           inputValue={String(filmForm.year)}
           constraints={getConstraints("year", filmForm.year)}
           allConstraintsGood={checkIfAllGood("year")}
@@ -107,7 +131,7 @@ export default function EditOverlay({
         <Input
           id="countries"
           labelText="Countries"
-          onChange={(e) => handleChange("countries", e.target.value)}
+          onChange={(e) => handleUpdate("countries", e.target.value)}
           inputValue={filmForm.countries}
           constraints={getConstraints("countries", filmForm.countries)}
           allConstraintsGood={checkIfAllGood("countries")}
@@ -116,7 +140,7 @@ export default function EditOverlay({
         <Input
           id="languages"
           labelText="Languages"
-          onChange={(e) => handleChange("languages", e.target.value)}
+          onChange={(e) => handleUpdate("languages", e.target.value)}
           inputValue={filmForm.languages}
           constraints={getConstraints("languages", filmForm.languages)}
           allConstraintsGood={checkIfAllGood("languages")}
@@ -125,7 +149,7 @@ export default function EditOverlay({
         <Input
           id="poster"
           labelText="Poster URL"
-          onChange={(e) => handleChange("poster", e.target.value)}
+          onChange={(e) => handleUpdate("poster", e.target.value)}
           inputValue={filmForm.poster}
           constraints={getConstraints("poster", filmForm.poster)}
           allConstraintsGood={checkIfAllGood("poster")}
@@ -134,7 +158,7 @@ export default function EditOverlay({
         <Input
           id="backdrop"
           labelText="Backdrop URL"
-          onChange={(e) => handleChange("backdrop", e.target.value)}
+          onChange={(e) => handleUpdate("backdrop", e.target.value)}
           inputValue={filmForm.backdrop}
           constraints={getConstraints("backdrop", filmForm.backdrop)}
           allConstraintsGood={checkIfAllGood("backdrop")}
@@ -143,11 +167,12 @@ export default function EditOverlay({
         <TextArea
           id="plot"
           labelText="Plot Summary"
-          onChange={(e) => handleChange("plot", e.target.value)}
+          onChange={(e) => handleUpdate("plot", e.target.value)}
           inputValue={filmForm.plot}
           constraints={getConstraints("plot", filmForm.plot)}
           allConstraintsGood={checkIfAllGood("plot")}
         />
+        <GenreLabels genres={allGenres} setGenres={setAllGenres} />
       </div>
     </div>
   );
