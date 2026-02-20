@@ -1,34 +1,42 @@
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
-import type { Screening } from "../../types";
-import { Heart, Pencil, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import type { Screening, Theatre } from "../../types";
+import { Heart, Pencil, Trash2 } from "lucide-react";
+import {  useState } from "react";
 
 interface ScreeningCardProp {
   screen: Screening;
   theatre: string;
   screening_date: string;
+  allTheatres:Theatre[]
 }
 
 export default function ScreeningCard({
   screen,
   theatre,
   screening_date,
+  allTheatres
 }: ScreeningCardProp) {
   const { is_admin } = useAuth();
-  const rawTime = screen.start_time;
-  const date = new Date(`1970-01-01T${rawTime}`);
+
   const [isEdit, setIsEdit] = useState(false);
   const [screeningDate, setScreeningDate] = useState<string>(screening_date);
   const [screeningTime, setScreeningTime] = useState<string>(screen.start_time);
   const [url, setUrl] = useState<string>(screen.ticket_url);
-  const [screeningTheatre, setScreeningTheatre] = useState<string>(theatre);
+  const [screeningTheatre, setScreeningTheatre] = useState<string>(()=>{
+    const found = allTheatres.find(t => t.name === theatre);
+    return found ? found.name : theatre;
+  });
+  
 
+  const rawTime = screen.start_time;
+  const date = new Date(`1970-01-01T${rawTime}`);
   const formattedTime = date.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
   });
+
 
   async function handleDelete(e: React.MouseEvent<SVGElement, MouseEvent>) {
     e.preventDefault();
@@ -71,21 +79,35 @@ export default function ScreeningCard({
     return (
       <div
         className="bg-[#292929] w-[90%] p-2 flex justify-between rounded-sm 
-        items-center hover:text-white hover:cursor-pointer flex-col"
+        items-center  flex-col"
       >
         <div className="flex flex-col items-start">
-          <input type="date" value={screeningDate} onChange={(e)=>setScreeningDate(e.target.value)}/>
-          <input type="time" className="font-semibold text-lg" value={screeningTime} 
-          onChange={(e)=>setScreeningTime(e.target.value)}/>
-           <input  className="font-semibold text-lg" value={screeningTheatre} 
-          onChange={(e)=>setScreeningTime(e.target.value)}/>
-           <input  className="font-semibold text-lg" value={url} 
-          onChange={(e)=>setScreeningTime(e.target.value)}/>
-        </div>
-                <div className="flex gap-3">
-          <button
-            className="bg-[#ab76f5]  text-sm  font-semibold p-1 rounded-md cursor-pointer"
+          <input
+            type="date"
+            value={screeningDate}
+            onChange={(e) => setScreeningDate(e.target.value)}
+          />
+          <input
+            type="time"
+            className="font-semibold text-lg"
+            value={screeningTime}
+            onChange={(e) => setScreeningTime(e.target.value)}
+          />
+          <select
+            className="font-semibold text-lg"
+            value={screeningTheatre}
+            onChange={(e) => setScreeningTheatre(e.target.value)}
           >
+            {allTheatres.map(t=><option className="" value={t.name}>{t.name}</option>)}
+            </select>
+          <input
+            className="font-semibold text-lg"
+            value={url}
+            onChange={(e) => setScreeningTime(e.target.value)}
+          />
+        </div>
+        <div className="flex gap-3">
+          <button className="bg-[#ab76f5]  text-sm  font-semibold p-1 rounded-md cursor-pointer">
             Submit
           </button>
           <button

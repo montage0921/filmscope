@@ -1,7 +1,9 @@
 import HoverLabel from '../../Utility/HoverLabel';
-import type { Screening, ShowInfo } from '../../types';
+import type { Screening, ShowInfo, Theatre } from '../../types';
 import { Mic, Star } from 'lucide-react';
 import ScreeningCard from './ScreeningCard';
+import { useEffect, useState } from 'react';
+import axios, { all } from 'axios';
 
 
 interface ShowTimeProps {
@@ -9,6 +11,21 @@ interface ShowTimeProps {
 }
 
 export default function Showtime({ showInfo }: ShowTimeProps) {
+  const [allTheatres, setAllTheatres] = useState<Theatre[]>([]);
+    useEffect(function(){
+    async function getAllTheatres(){
+      try{
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/theatres`)
+        console.log(res.data)
+        setAllTheatres(res.data);
+      }catch(error){
+        console.log("Failed to get all theatres info")
+      }
+    }
+
+    getAllTheatres()
+  },[])
+
   return (
     <div className="Showtime col-span-1 text-center text-gray-300">
       <div className="w-full font-medium border-b-2 text-center mb-2 border-gray-700">
@@ -72,6 +89,7 @@ export default function Showtime({ showInfo }: ShowTimeProps) {
                                 screen={screen}
                                 theatre={theatre}
                                 screening_date={date}
+                                allTheatres={allTheatres}
                               />
                             ))}
                         </div>

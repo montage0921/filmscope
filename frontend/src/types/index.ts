@@ -77,3 +77,8 @@ export type BasicFilmInfo = {
   backdrop: string;
   plot: string;
 };
+
+export type Theatre = {
+  theatre_id: number;
+  name: string;
+};
