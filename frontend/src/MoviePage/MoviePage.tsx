@@ -57,6 +57,8 @@ export default function MoviePage() {
         `${import.meta.env.VITE_BACKEND_BASE_URL}/films/${id}`,
       );
       setDetailedInfo(res.data);
+      console.log(res)
+      // detailedInfo?.showInfoByDate?.show_inf
       setIsLoading(false);
     } catch (e) {
       console.log(e);
@@ -74,6 +76,8 @@ export default function MoviePage() {
         <LoadingDots />
       </div>
     );
+  
+  
 
   return (
     /* Use min-h-dvh to prevent iPhone browser UI from cutting off the bottom */

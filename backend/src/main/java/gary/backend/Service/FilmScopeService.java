@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ import gary.backend.Entity.Show;
 import gary.backend.Entity.Theatre;
 import gary.backend.Repository.FilmRepository;
 import gary.backend.Repository.GenreRepository;
+import gary.backend.Repository.ScreeningRepository;
 import gary.backend.Repository.ShowRepository;
 import gary.backend.Repository.TheatreRepository;
 import jakarta.transaction.Transactional;
@@ -36,6 +39,7 @@ public class FilmScopeService {
     private final ShowRepository showRepository;
     private final FilmRepository filmRepository;
     private final GenreRepository genreRepository;
+    private final ScreeningRepository screeningRepository;
 
     // for testing
     public List<Theatre> getAllTheatres() {
@@ -71,32 +75,40 @@ public class FilmScopeService {
 
         List<Show> shows = film.getShows();
         Map<String, Map<LocalDate, Map<String, ShowDto>>> showInfoByDate = new HashMap<>();
+
         for (Show s : shows) {
             String theatre = s.getTheatre().getName();
             List<Screening> screenings = s.getScreenings();
 
-            List<ScreeningDto> screeningDtos = new ArrayList<>();
             for (Screening sc : screenings) {
-                int screening_id = sc.getScreening_id();
                 LocalDate star_date = sc.getStart_date();
-                LocalTime start_time = sc.getStart_time();
-                String ticket_url = sc.getTicket_url();
 
+                // 1. Get or create the ShowDto for this specific date and theatre
+                Map<String, ShowDto> theatreMap = showInfoByDate
+                        .computeIfAbsent("show_info", k -> new TreeMap<>()) // TreeMap keeps dates sorted
+                        .computeIfAbsent(star_date, k -> new HashMap<>());
+
+                ShowDto showDto = theatreMap.get(theatre);
+
+                if (showDto == null) {
+                    // First time seeing this theatre on this date, create a new ShowDto
+                    showDto = new ShowDto(
+                            s.getShow_id(),
+                            s.getShow_name(),
+                            s.getSpecial(),
+                            s.getQa_with(),
+                            new ArrayList<>() // Fresh list for THIS date/theatre combo
+                    );
+                    theatreMap.put(theatre, showDto);
+                }
+
+                // 2. Add ONLY this specific screening to the Dto's list
                 ScreeningDto screeningDto = new ScreeningDto();
-                screeningDto.setScreening_id(screening_id);
-                screeningDto.setStart_time(start_time);
-                screeningDto.setTicket_url(ticket_url);
+                screeningDto.setScreening_id(sc.getScreening_id());
+                screeningDto.setStart_time(sc.getStart_time());
+                screeningDto.setTicket_url(sc.getTicket_url());
 
-                screeningDtos.add(screeningDto);
-
-                showInfoByDate.computeIfAbsent("show_info", k -> new HashMap<>())
-                        .computeIfAbsent(star_date, k -> new HashMap<>())
-                        .put(theatre, new ShowDto(
-                                s.getShow_id(),
-                                s.getShow_name(),
-                                s.getSpecial(),
-                                s.getQa_with(),
-                                screeningDtos));
+                showDto.getScreenings().add(screeningDto);
             }
         }
 
@@ -192,6 +204,15 @@ public class FilmScopeService {
         filmRepository.save(film);
 
         return ResponseEntity.ok("Movie Genre has been successfully updated!");
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteScreening(int screening_id) {
+        if (!screeningRepository.findById(screening_id).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Screening doesn't exist");
+        }
+        screeningRepository.deleteById(screening_id);
+        return ResponseEntity.ok("The screening is successfully deleted");
     }
 
 }

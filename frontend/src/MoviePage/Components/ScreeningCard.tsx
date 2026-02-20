@@ -1,5 +1,7 @@
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import type { Screening } from "../../types";
-import { Heart} from "lucide-react";
+import {  Heart, Pencil,  Trash2 } from "lucide-react";
 
 interface ScreeningCardProp {
   screen: Screening;
@@ -7,6 +9,7 @@ interface ScreeningCardProp {
 }
 
 export default function ScreeningCard({ screen, theatre }: ScreeningCardProp) {
+  const { is_admin } = useAuth();
   const rawTime = screen.start_time;
   const date = new Date(`1970-01-01T${rawTime}`);
 
@@ -15,6 +18,44 @@ export default function ScreeningCard({ screen, theatre }: ScreeningCardProp) {
     minute: "2-digit",
     hour12: true,
   });
+
+  async function handleDelete(e: React.MouseEvent<SVGElement, MouseEvent>) {
+    e.preventDefault();
+    e.stopPropagation();
+    const screening_id = screen.screening_id;
+    console.log(screening_id)
+    return
+    if (!screening_id) {
+      alert("Not a valid screening");
+      return;
+    }
+
+    const JWT = localStorage.getItem("token");
+    if (!JWT) {
+      alert("no JWT token");
+      return;
+    }
+    const config = {
+      headers: { Authorization: `Bearer ${JWT}` },
+      validateStatus: () => true,
+    };
+
+    try {
+      const res = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/screenings/${screening_id}`,
+        config,
+      );
+      if (res.status >= 200 && res.status < 300) {
+        alert("Screening deleted successfully!");
+        window.location.reload();
+      } else {
+        alert(`Delete failed: ${res.status}`);
+      }
+    } catch (error) {
+      console.error("Delete request error:", error);
+      alert("An error occurred while deleting.");
+    }
+  }
 
   return (
     <a
@@ -29,9 +70,17 @@ export default function ScreeningCard({ screen, theatre }: ScreeningCardProp) {
         </span>
         <span className="self-start text-[10px]">{theatre}</span>
       </div>
-      <div>
-        <Heart />
-      </div>
+      {is_admin ? (
+        <div className="flex gap-3">
+          <Heart />
+          <Trash2 onClick={(e) => handleDelete(e)} />
+          <Pencil />
+        </div>
+      ) : (
+        <div>
+          <Heart />
+        </div>
+      )}
     </a>
   );
 }
