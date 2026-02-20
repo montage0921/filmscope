@@ -18,6 +18,7 @@ import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ScreeningDto;
 import gary.backend.DTO.ShowDescriptionDto;
 import gary.backend.DTO.ShowDto;
+import gary.backend.DTO.TheatreDto;
 import gary.backend.Entity.Film;
 import gary.backend.Entity.Genre;
 import gary.backend.Entity.Screening;
@@ -42,8 +43,16 @@ public class FilmScopeService {
     private final ScreeningRepository screeningRepository;
 
     // for testing
-    public List<Theatre> getAllTheatres() {
-        return theatreRepository.findAll();
+    public List<TheatreDto> getAllTheatres() {
+        List<Theatre> allTheatres = theatreRepository.findAll();
+        List<TheatreDto> allTheatresDto = new ArrayList<>();
+        for (Theatre theatre : allTheatres) {
+            TheatreDto theatreDto = new TheatreDto();
+            theatreDto.setName(theatre.getName());
+            theatreDto.setTheatre_id(theatre.getTheatre_id());
+            allTheatresDto.add(theatreDto);
+        }
+        return allTheatresDto;
     }
 
     // get show by id

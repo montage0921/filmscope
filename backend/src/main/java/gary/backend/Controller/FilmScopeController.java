@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 import gary.backend.DTO.DetailedFilmPageDto;
 import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ShowDescriptionDto;
+import gary.backend.DTO.TheatreDto;
 import gary.backend.Entity.Genre;
 import gary.backend.Entity.Show;
-import gary.backend.Entity.Theatre;
 import gary.backend.Service.FilmScopeService;
 import lombok.AllArgsConstructor;
 
@@ -32,7 +32,7 @@ public class FilmScopeController {
     private final FilmScopeService filmScopeService;
 
     @GetMapping("/theatres")
-    public List<Theatre> getAllTheatres() {
+    public List<TheatreDto> getAllTheatres() {
         return filmScopeService.getAllTheatres();
     }
 
