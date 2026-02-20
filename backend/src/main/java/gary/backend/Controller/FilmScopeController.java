@@ -7,7 +7,9 @@ import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ShowDescriptionDto;
 import gary.backend.DTO.TheatreDto;
 import gary.backend.Entity.Genre;
+import gary.backend.Entity.Screening;
 import gary.backend.Entity.Show;
+import gary.backend.Entity.Theatre;
 import gary.backend.Service.FilmScopeService;
 import lombok.AllArgsConstructor;
 
@@ -81,5 +83,4 @@ public class FilmScopeController {
     public ResponseEntity<String> deleteScreening(@PathVariable int screening_id) {
         return filmScopeService.deleteScreening(screening_id);
     }
-
 }

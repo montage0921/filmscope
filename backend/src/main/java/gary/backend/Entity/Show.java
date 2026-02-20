@@ -3,8 +3,11 @@ package gary.backend.Entity;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.engine.internal.CascadePoint;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -47,7 +50,8 @@ public class Show {
     @Column(name = "qa_with")
     private String qa_with;
 
-    @OneToMany(mappedBy = "show")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "show_id")
     private List<Screening> screenings;
 
     @ManyToMany

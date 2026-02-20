@@ -33,12 +33,6 @@ public class Screening {
     @Column(name = "screening_id")
     private int screening_id;
 
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "show_id", referencedColumnName = "show_id")
-    @ToString.Exclude
-    private Show show;
-
     @Column(name = "start_date")
     private LocalDate start_date;
 
