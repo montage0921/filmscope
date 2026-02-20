@@ -60,18 +60,17 @@ public class FilmScopeController {
         return filmScopeService.getAllGenres();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping("/films/{film_id}")
     public ResponseEntity<String> updateFilmInfo(@PathVariable int film_id,
             @RequestBody Map<String, String> updated) {
         return filmScopeService.updateFilmInfo(film_id, updated);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/films/{film_id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/films/{film_id}/genres")
     public ResponseEntity<String> updateFilmGenre(@PathVariable int film_id,
             @RequestBody List<Genre> genres) {
-        // TODO: process POST request
 
         return filmScopeService.updateFilmGenre(film_id, genres);
     }

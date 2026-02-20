@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
@@ -61,11 +62,13 @@ public class User {
     @ManyToMany
     @JoinTable(name = "liked_films", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "film_id"))
     @JsonIgnoreProperties("likedBy")
+    @ToString.Exclude
     private Set<Film> films;
 
     @ManyToMany
     @JoinTable(name = "liked_screenings", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "screening_id"))
     @JsonIgnoreProperties("likedBy")
+    @ToString.Exclude
     private Set<Screening> screenings;
 
 }

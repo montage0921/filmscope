@@ -25,6 +25,7 @@ import gary.backend.Repository.FilmRepository;
 import gary.backend.Repository.GenreRepository;
 import gary.backend.Repository.ShowRepository;
 import gary.backend.Repository.TheatreRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -181,9 +182,13 @@ public class FilmScopeService {
         return ResponseEntity.ok("Movie info has been successfully updated🎉");
     }
 
+    @Transactional
     public ResponseEntity<String> updateFilmGenre(int film_id, List<Genre> genres) {
         Film film = filmRepository.findById(film_id).orElseThrow(() -> new RuntimeException("Film not found"));
-        film.setGenres(genres);
+        film.getGenres().clear();
+        if (genres != null) {
+            film.getGenres().addAll(genres);
+        }
         filmRepository.save(film);
 
         return ResponseEntity.ok("Movie Genre has been successfully updated!");

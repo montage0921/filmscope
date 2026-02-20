@@ -9,11 +9,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -65,13 +68,17 @@ public class Film {
 
     @ManyToMany(mappedBy = "films")
     @JsonIgnoreProperties("films")
+    @ToString.Exclude
     private List<Show> shows;
 
-    @ManyToMany(mappedBy = "films")
+    @ManyToMany
+    @JoinTable(name = "genre_film", joinColumns = @JoinColumn(name = "film_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @ToString.Exclude
     private List<Genre> genres;
 
     @ManyToMany(mappedBy = "films")
     @JsonIgnoreProperties("films")
+    @ToString.Exclude
     private List<User> likedBy;
 
 }

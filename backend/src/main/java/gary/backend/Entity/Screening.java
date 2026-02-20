@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,6 +36,7 @@ public class Screening {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "show_id", referencedColumnName = "show_id")
+    @ToString.Exclude
     private Show show;
 
     @Column(name = "start_date")
@@ -48,5 +50,6 @@ public class Screening {
 
     @ManyToMany(mappedBy = "screenings")
     @JsonIgnoreProperties("screenings")
+    @ToString.Exclude
     private Set<User> likedBy;
 }

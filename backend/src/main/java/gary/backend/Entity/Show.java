@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -35,6 +36,7 @@ public class Show {
 
     @ManyToOne
     @JoinColumn(name = "theatre_id", referencedColumnName = "theatre_id")
+    @ToString.Exclude
     private Theatre theatre;
 
     @Column(name = "show_name")
@@ -50,11 +52,8 @@ public class Show {
     private List<Screening> screenings;
 
     @ManyToMany
-    @JoinTable(
-        name = "show_films",
-        joinColumns =  @JoinColumn(name = "show_id"),
-        inverseJoinColumns = @JoinColumn(name = "film_id")
-    )
+    @JoinTable(name = "show_films", joinColumns = @JoinColumn(name = "show_id"), inverseJoinColumns = @JoinColumn(name = "film_id"))
     @JsonIgnoreProperties("shows")
+    @ToString.Exclude
     private Set<Film> films;
 }

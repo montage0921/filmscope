@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -32,9 +33,9 @@ public class Genre {
     @Column(name = "genre")
     private String genre;
 
-    @ManyToMany
-    @JoinTable(name = "genre_film", joinColumns = @JoinColumn(name = "genre_id"), inverseJoinColumns = @JoinColumn(name = "film_id"))
+    @ManyToMany(mappedBy = "genres")
     @JsonIgnore
+    @ToString.Exclude
     private Set<Film> films;
 
 }
