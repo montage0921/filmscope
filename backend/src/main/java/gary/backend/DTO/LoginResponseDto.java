@@ -1,6 +1,5 @@
 package gary.backend.DTO;
 
-import gary.backend.Entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
