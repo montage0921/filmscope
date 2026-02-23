@@ -11,11 +11,13 @@ export interface Show {
   show_title: string;
   special: string;
   qa_with: string;
+  theatre: Theatre;
   screenings: Screening[];
 }
 
 export interface Screening {
   screening_id: number;
+  start_date: string;
   start_time: string;
   ticket_url: string;
 }
@@ -81,4 +83,14 @@ export type BasicFilmInfo = {
 export type Theatre = {
   theatre_id: number;
   name: string;
+};
+
+export type EditShowDto = {
+  show_id: number;
+  film_title: string;
+  show_name: string;
+  qa_with: string;
+  special: string;
+  theatreDto: Theatre;
+  screenings: Screening[];
 };
