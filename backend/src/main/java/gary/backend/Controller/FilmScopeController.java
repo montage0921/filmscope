@@ -3,13 +3,12 @@ package gary.backend.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import gary.backend.DTO.DetailedFilmPageDto;
+import gary.backend.DTO.EditShowDto;
 import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ShowDescriptionDto;
 import gary.backend.DTO.TheatreDto;
 import gary.backend.Entity.Genre;
-import gary.backend.Entity.Screening;
 import gary.backend.Entity.Show;
-import gary.backend.Entity.Theatre;
 import gary.backend.Service.FilmScopeService;
 import lombok.AllArgsConstructor;
 
@@ -61,6 +60,11 @@ public class FilmScopeController {
     @GetMapping("genres")
     public List<Genre> getAllGenres() {
         return filmScopeService.getAllGenres();
+    }
+
+    @GetMapping("/films/{film_id}/shows")
+    public ResponseEntity<List<EditShowDto>> getShowsForFilm(@PathVariable int film_id) {
+        return filmScopeService.getShowsForFilm(film_id);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

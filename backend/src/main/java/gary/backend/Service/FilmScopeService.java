@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import gary.backend.DTO.DetailedFilmPageDto;
+import gary.backend.DTO.EditShowDto;
 import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ScreeningDto;
 import gary.backend.DTO.ShowDescriptionDto;
@@ -154,6 +156,37 @@ public class FilmScopeService {
 
     public List<Genre> getAllGenres() {
         return genreRepository.findAll();
+    }
+
+    public ResponseEntity<List<EditShowDto>> getShowsForFilm(int film_id) {
+        Optional<Film> opFilm = filmRepository.findById(film_id);
+        if (!opFilm.isPresent())
+            return ResponseEntity.notFound().build();
+
+        Film film = opFilm.get();
+        String film_title = film.getTitle();
+
+        List<Show> shows = film.getShows();
+        List<EditShowDto> editShowDtos = new ArrayList<>();
+        for (Show show : shows) {
+            EditShowDto editShowDto = new EditShowDto();
+            editShowDto.setShow_id(show.getShow_id());
+            editShowDto.setFilm_title(film_title);
+            editShowDto.setShow_name(show.getShow_name());
+            editShowDto.setQa_with(show.getQa_with());
+            editShowDto.setSpecial(show.getSpecial());
+
+            TheatreDto theatreDto = new TheatreDto();
+            theatreDto.setName(show.getTheatre().getName());
+            theatreDto.setTheatre_id(show.getTheatre().getTheatre_id());
+            editShowDto.setTheatreDto(theatreDto);
+
+            editShowDto.setScreenings(show.getScreenings());
+
+            editShowDtos.add(editShowDto);
+        }
+
+        return ResponseEntity.ok(editShowDtos);
     }
 
     // update basic film info (except genres)
