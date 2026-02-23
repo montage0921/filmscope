@@ -40,33 +40,58 @@ export default function ShowEditPage() {
   }, [selectedShowId, shows, selectedTab]);
 
   return (
-    <div>
-      <div>
-        <div className="flex gap-3">
+    <div
+      className="absolute top-20 left-1/2 -translate-x-1/2 
+             w-[95%] md:w-[80%] 
+             flex flex-col items-center justify-start gap-8 
+             pb-20 /* 给底部留点空间，防止滑到底部被挡住 */"
+    >
+      <div className="flex items-end justify-start gap-8 w-full border-b border-gray-700">
+        <div
+          className="pb-2 transition-all duration-300"
+          style={{
+            borderBottom:
+              selectedTab === "edit"
+                ? "4px solid #ab76f5"
+                : "4px solid transparent",
+          }}
+        >
           <select
+            className="bg-transparent outline-none cursor-pointer font-bold"
+            style={{ color: selectedTab === "edit" ? "#ab76f5" : "#9ca3af" }}
             value={selectedShowId}
-            onChange={(e) => setSelectedShowId(Number(e.target.value))}
+            onChange={(e) => {
+              setSelectedShowId(Number(e.target.value));
+              setSelectedTab("edit");
+            }}
             onClick={() => setSelectedTab("edit")}
           >
             {shows.map((s) => (
-              <option key={s.show_id} value={s.show_id}>
+              <option key={s.show_id} value={s.show_id} className="text-black">
                 {s.show_name} at {s.theatreDto.name}
               </option>
             ))}
           </select>
-          <div onClick={() => setSelectedTab("add")}>Add New Show</div>
         </div>
-        {selectedTab === "edit" && (
-          <EditShowForm
-            curShow={curShow}
-          />
-        )}
-        {selectedTab === "add" && (
-          <EditShowForm
-            curShow={null}
 
-          />
-        )}
+        <div
+          onClick={() => setSelectedTab("add")}
+          className="pb-2 cursor-pointer transition-all duration-300 font-bold text-[15px] lg:text-base"
+          style={{
+            borderBottom:
+              selectedTab === "add"
+                ? "4px solid #ab76f5"
+                : "4px solid transparent",
+            color: selectedTab === "add" ? "#ab76f5" : "#9ca3af",
+          }}
+        >
+          Add New Show
+        </div>
+      </div>
+
+      <div className="w-full flex flex-col items-start">
+        {selectedTab === "edit" && <EditShowForm curShow={curShow} curTab="edit" />}
+        {selectedTab === "add" && <EditShowForm curShow={null} curTab="add" />}
       </div>
     </div>
   );

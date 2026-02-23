@@ -3,11 +3,13 @@ import { useShowEditForm } from "./hooks/useShowEditForm";
 import Input from "../Auth/Input";
 import { useEffect, useState } from "react";
 import EditScreening from "./EditScreening";
-import { CirclePlus, Theater } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import axios from "axios";
+import Button from "../Utility/Button";
 
 type EditShowFormProps = {
   curShow: EditShowDto | null;
+  curTab:string
 };
 
 export type EditShowBasicInfo = {
@@ -17,7 +19,7 @@ export type EditShowBasicInfo = {
   special: string;
 };
 
-export default function EditShowForm({ curShow }: EditShowFormProps) {
+export default function EditShowForm({ curShow,curTab }: EditShowFormProps) {
   const [screenings, setAllScreenings] = useState<Screening[] | undefined>(
     curShow?.screenings,
   );
@@ -62,7 +64,26 @@ export default function EditShowForm({ curShow }: EditShowFormProps) {
   } = useShowEditForm(initialShowDto);
 
   return (
-    <div>
+    <div className="w-[90%] lg:w-[40%] flex flex-col gap-3">
+      <div className="flex gap-3">
+         {curTab !== 'add' && <Button
+        text="Delete Show"
+        style={{
+          backgroundColor: "#ef4444", // 红色
+          fontSize: "14px",
+        }}
+        onClick={() => console.log("Deleting...")}
+      />}
+      <Button
+        text={curTab === 'add'?'Add Show':'Apply Change'}
+        style={{
+          backgroundColor: "green", 
+          fontSize: "14px",
+        }}
+        onClick={() => alert("Saving...")}
+      />
+      </div>
+     
       <Input
         id="show_name"
         labelText="Show Name"
@@ -97,12 +118,20 @@ export default function EditShowForm({ curShow }: EditShowFormProps) {
         <select
           value={selectedTheatre}
           onChange={(e) => setSelectedTheatre(Number(e.target.value))}
+          className="bg-transparent border border-gray-500 rounded-md px-2 py-1 
+               text-[#ab76f5] outline-none focus:border-[#ab76f5] 
+               cursor-pointer appearance-none"
         >
           {allTheatres.map((t) => (
-            <option value={t.theatre_id}>{t.name}</option>
+            <option
+              key={t.theatre_id}
+              value={t.theatre_id}
+              className="text-black"
+            >
+              {t.name}
+            </option>
           ))}
         </select>
-        <div>{allTheatres.find(t=>t.theatre_id === selectedTheatre)?.name}</div>
       </div>
 
       <div>
