@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateShowDto {
     private ShowBasicUpdateDto showBasicUpdateDto;
-    private int theatre_id;
+    private Integer theatre_id;
     private Integer film_id;
     private List<Screening> screenings;
 

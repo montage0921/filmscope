@@ -128,7 +128,7 @@ export default function EditShowForm({ curShow, curTab, film_id }: EditShowFormP
       },
       theatre_id: Number(selectedTheatre),
       screenings: uploadScreenings,
-      film_id
+      film_id:Number(film_id)
     };
 
     try {
