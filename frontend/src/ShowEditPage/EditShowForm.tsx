@@ -6,7 +6,6 @@ import EditScreening from "./EditScreening";
 import { CirclePlus } from "lucide-react";
 import axios from "axios";
 import Button from "../Utility/Button";
-import { select } from "motion/react-client";
 import { useNavigate } from "react-router-dom";
 
 type EditShowFormProps = {
