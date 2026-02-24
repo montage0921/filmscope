@@ -1,5 +1,6 @@
 package gary.backend.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -50,7 +51,7 @@ public class Show {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "show_id")
-    private List<Screening> screenings;
+    private List<Screening> screenings = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "show_films", joinColumns = @JoinColumn(name = "show_id"), inverseJoinColumns = @JoinColumn(name = "film_id"))

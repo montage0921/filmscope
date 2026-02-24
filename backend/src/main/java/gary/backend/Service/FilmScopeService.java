@@ -4,14 +4,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import gary.backend.DTO.DetailedFilmPageDto;
 import gary.backend.DTO.EditShowDto;
@@ -250,15 +253,6 @@ public class FilmScopeService {
     }
 
     @Transactional
-    public ResponseEntity<String> deleteScreening(int screening_id) {
-        if (!screeningRepository.findById(screening_id).isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Screening doesn't exist");
-        }
-        screeningRepository.deleteById(screening_id);
-        return ResponseEntity.ok("The screening is successfully deleted");
-    }
-
-    @Transactional
     public ResponseEntity<String> updateShow(int show_id, UpdateShowDto updateShowDto) {
         Optional<Show> opShow = showRepository.findById(show_id);
         if (!opShow.isPresent()) {
@@ -293,6 +287,63 @@ public class FilmScopeService {
 
         return ResponseEntity.ok("The show is successfully updated!");
 
+    }
+
+    @Transactional
+    public ResponseEntity<String> addNewShow(UpdateShowDto updateShowDto) {
+        ShowBasicUpdateDto showBasicUpdateDto = updateShowDto.getShowBasicUpdateDto();
+        if (showBasicUpdateDto.getShow_name() == null || showBasicUpdateDto.getShow_name().isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Show title cannot be empty");
+        }
+
+        Optional<Theatre> opTheatre = theatreRepository.findById(updateShowDto.getTheatre_id());
+        if (!opTheatre.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Please provide a valid theatre");
+        }
+        Theatre theatre = opTheatre.get();
+
+        Show show = new Show();
+        show.setShow_name(showBasicUpdateDto.getShow_name());
+        show.setQa_with(showBasicUpdateDto.getQa_with());
+        show.setSpecial(showBasicUpdateDto.getSpecial());
+        show.setTheatre(theatre);
+
+        Optional<Film> opFilm = filmRepository.findById(updateShowDto.getFilm_id());
+        if (opFilm.isPresent()) {
+            Set<Film> filmSet = new HashSet<>();
+            filmSet.add(opFilm.get());
+            show.setFilms(filmSet);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Film not found");
+        }
+
+        List<Screening> newScreenings = updateShowDto.getScreenings();
+        if (newScreenings != null) {
+            show.getScreenings().addAll(newScreenings);
+        }
+        showRepository.save(show);
+
+        return ResponseEntity.ok("The show is successfully added!");
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteScreening(int screening_id) {
+        if (!screeningRepository.findById(screening_id).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Screening doesn't exist");
+        }
+        screeningRepository.deleteById(screening_id);
+        return ResponseEntity.ok("The screening is successfully deleted");
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteShow(int show_id) {
+        if (!showRepository.findById(show_id).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Show doesn't exist");
+        }
+        showRepository.deleteById(show_id);
+        return ResponseEntity.ok("The show is successfully deleted");
     }
 
 }

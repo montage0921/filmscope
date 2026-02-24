@@ -128,9 +128,9 @@ export default function ShowEditPage() {
 
       <div className="w-full flex flex-col items-start">
         {selectedTab === "edit" && (
-          <EditShowForm curShow={curShow} curTab="edit" />
+          <EditShowForm curShow={curShow} curTab="edit" film_id={film_id} />
         )}
-        {selectedTab === "add" && <EditShowForm curShow={null} curTab="add" />}
+        {selectedTab === "add" && <EditShowForm curShow={null} curTab="add" film_id={film_id}/>}
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 type EditShowFormProps = {
   curShow: EditShowDto | null;
   curTab: string;
+  film_id:string | undefined
 };
 
 export type EditShowBasicInfo = {
@@ -21,7 +22,7 @@ export type EditShowBasicInfo = {
   special: string;
 };
 
-export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
+export default function EditShowForm({ curShow, curTab, film_id }: EditShowFormProps) {
   const [screenings, setAllScreenings] = useState<Screening[] | undefined>(
     curShow?.screenings,
   );
@@ -67,7 +68,36 @@ export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
     getConstraints,
   } = useShowEditForm(initialShowDto);
 
-  async function handleApplyChange() {
+  async function handleDeleteShow() {
+    const show_id = curShowBasicInfo.show_id;
+    if (show_id === -1) {
+      alert("This is not an existing show, please add as a new one");
+      return;
+    }
+
+    const JWT = localStorage.getItem("token");
+    if (!JWT) {
+      alert("no JWT token");
+      return;
+    }
+    const config = {
+      headers: { Authorization: `Bearer ${JWT}` },
+    };
+
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/shows/${show_id}`,
+        config,
+      );
+      alert("The show is deleted");
+      nav(-1);
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Failed to delete current show. Check console for details.");
+    }
+  }
+
+  async function handleApplyChangeOrAddNew() {
     const show_id = curShowBasicInfo.show_id;
 
     const JWT = localStorage.getItem("token");
@@ -81,7 +111,7 @@ export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
     };
 
     // 1. upload show's basic info
-    if (show_id === -1) {
+    if (curTab !== 'add' && show_id === -1) {
       alert("This is not an existing show, please add as a new one");
       return;
     }
@@ -99,15 +129,26 @@ export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
       },
       theatre_id: Number(selectedTheatre),
       screenings: uploadScreenings,
+      film_id
     };
 
     try {
-      await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/shows/${show_id}`,
-        updatedShow,
-        config,
-      );
-      alert("All changes saved successfully!");
+      if (curTab === "add") {
+        await axios.post(
+          `${import.meta.env.VITE_BACKEND_BASE_URL}/shows/new-show`,
+          updatedShow,
+          config,
+        );
+        alert("New show is added!");
+      } else {
+        await axios.post(
+          `${import.meta.env.VITE_BACKEND_BASE_URL}/shows/${show_id}`,
+          updatedShow,
+          config,
+        );
+        alert("All changes saved successfully!");
+      }
+
       nav(-1);
     } catch (err) {
       console.error("Save failed:", err);
@@ -115,9 +156,6 @@ export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
     }
   }
 
-  function handleAddShow() {
-    alert("add new show");
-  }
 
   return (
     <div className="w-[90%] lg:w-[40%] flex flex-col gap-3">
@@ -129,7 +167,7 @@ export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
               backgroundColor: "#ef4444", // 红色
               fontSize: "14px",
             }}
-            onClick={() => console.log("Deleting...")}
+            onClick={handleDeleteShow}
           />
         )}
         <Button
@@ -138,7 +176,7 @@ export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
             backgroundColor: "green",
             fontSize: "14px",
           }}
-          onClick={curTab === "add" ? handleAddShow : handleApplyChange}
+          onClick={handleApplyChangeOrAddNew}
         />
       </div>
 

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class UpdateShowDto {
     private ShowBasicUpdateDto showBasicUpdateDto;
     private int theatre_id;
+    private Integer film_id;
     private List<Screening> screenings;
 
 }
