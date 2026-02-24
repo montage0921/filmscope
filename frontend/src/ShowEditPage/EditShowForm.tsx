@@ -6,10 +6,12 @@ import EditScreening from "./EditScreening";
 import { CirclePlus } from "lucide-react";
 import axios from "axios";
 import Button from "../Utility/Button";
+import { select } from "motion/react-client";
+import { useNavigate } from "react-router-dom";
 
 type EditShowFormProps = {
   curShow: EditShowDto | null;
-  curTab:string
+  curTab: string;
 };
 
 export type EditShowBasicInfo = {
@@ -19,7 +21,7 @@ export type EditShowBasicInfo = {
   special: string;
 };
 
-export default function EditShowForm({ curShow,curTab }: EditShowFormProps) {
+export default function EditShowForm({ curShow, curTab }: EditShowFormProps) {
   const [screenings, setAllScreenings] = useState<Screening[] | undefined>(
     curShow?.screenings,
   );
@@ -28,6 +30,8 @@ export default function EditShowForm({ curShow,curTab }: EditShowFormProps) {
   const [selectedTheatre, setSelectedTheatre] = useState<number | undefined>(
     curShow?.theatreDto.theatre_id,
   );
+
+  const nav = useNavigate();
 
   useEffect(() => {
     setAllScreenings(curShow?.screenings || []);
@@ -63,27 +67,81 @@ export default function EditShowForm({ curShow,curTab }: EditShowFormProps) {
     getConstraints,
   } = useShowEditForm(initialShowDto);
 
+  async function handleApplyChange() {
+    const show_id = curShowBasicInfo.show_id;
+
+    const JWT = localStorage.getItem("token");
+    if (!JWT) {
+      alert("no JWT token");
+      return;
+    }
+
+    const config = {
+      headers: { Authorization: `Bearer ${JWT}` },
+    };
+
+    // 1. upload show's basic info
+    if (show_id === -1) {
+      alert("This is not an existing show, please add as a new one");
+      return;
+    }
+
+    const uploadScreenings = screenings?.map((sc) => {
+      const { screening_id, tempId, ...rest } = sc;
+      return { ...rest, likedBy: [] };
+    });
+
+    const updatedShow = {
+      showBasicUpdateDto: {
+        show_name: curShowBasicInfo.show_name,
+        special: curShowBasicInfo.special,
+        qa_with: curShowBasicInfo.qa_with,
+      },
+      theatre_id: Number(selectedTheatre),
+      screenings: uploadScreenings,
+    };
+
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/shows/${show_id}`,
+        updatedShow,
+        config,
+      );
+      alert("All changes saved successfully!");
+      nav(-1);
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("Failed to save changes. Check console for details.");
+    }
+  }
+
+  function handleAddShow() {
+    alert("add new show");
+  }
+
   return (
     <div className="w-[90%] lg:w-[40%] flex flex-col gap-3">
       <div className="flex gap-3">
-         {curTab !== 'add' && <Button
-        text="Delete Show"
-        style={{
-          backgroundColor: "#ef4444", // 红色
-          fontSize: "14px",
-        }}
-        onClick={() => console.log("Deleting...")}
-      />}
-      <Button
-        text={curTab === 'add'?'Add Show':'Apply Change'}
-        style={{
-          backgroundColor: "green", 
-          fontSize: "14px",
-        }}
-        onClick={() => alert("Saving...")}
-      />
+        {curTab !== "add" && (
+          <Button
+            text="Delete Show"
+            style={{
+              backgroundColor: "#ef4444", // 红色
+              fontSize: "14px",
+            }}
+            onClick={() => console.log("Deleting...")}
+          />
+        )}
+        <Button
+          text={curTab === "add" ? "Add Show" : "Apply Change"}
+          style={{
+            backgroundColor: "green",
+            fontSize: "14px",
+          }}
+          onClick={curTab === "add" ? handleAddShow : handleApplyChange}
+        />
       </div>
-     
+
       <Input
         id="show_name"
         labelText="Show Name"

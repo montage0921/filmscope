@@ -16,7 +16,8 @@ export interface Show {
 }
 
 export interface Screening {
-  screening_id: number;
+  screening_id?: number;
+  tempId?: string | number; // for newly added screening
   start_date: string;
   start_time: string;
   ticket_url: string;

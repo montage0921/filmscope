@@ -91,8 +91,6 @@ export default function EditOverlay({
     const genresChanged = JSON.stringify(filmInfo?.genres ?? []) !== JSON.stringify(allGenres ?? []);
 
     if (genresChanged) {
-      console.log("genre updating....")
-      console.log(allGenres)
       const req = axios.post(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/films/${film_id}/genres`,
         allGenres,

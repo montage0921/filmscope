@@ -30,8 +30,44 @@ export default function EditScreening({
       ticket_url: "",
     },
     onChange,
-    isAdding
+    isAdding,
   );
+
+  function handleDelete(
+    sc_id: number | undefined,
+    tempId: number | string | undefined,
+  ) {
+    if (sc_id == null && tempId == null) {
+      alert("not a valid screening");
+      return;
+    }
+    onChange((prev) => {
+      const copy = prev?.filter((sc) => {
+        if (sc_id != undefined) {
+          return sc.screening_id !== sc_id;
+        }
+        return sc.tempId !== tempId;
+      });
+      return copy;
+    });
+  }
+
+  function handleAdd() {
+    if (
+      !screeningForChange.start_date ||
+      !screeningForChange.start_time ||
+      !screeningForChange.ticket_url
+    ) {
+      alert("Start date, time and URL cannot be empty!");
+      return;
+    }
+    onChange((prev) => {
+      const newScreen = { ...screeningForChange, tempId: Date.now() };
+
+      return prev ? [...prev, newScreen] : [newScreen];
+    });
+    setIsAdding?.(false)
+  }
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-end gap-2 w-full mb-4 border-b border-gray-800 pb-4 lg:pb-2">
@@ -89,7 +125,7 @@ export default function EditScreening({
               backgroundColor: "green",
               fontSize: "14px",
             }}
-            onClick={() => console.log("Deleting...")}
+            onClick={() => handleAdd()}
           />
           <Button
             text="Cancel"
@@ -107,7 +143,9 @@ export default function EditScreening({
             backgroundColor: "red",
             fontSize: "14px",
           }}
-          onClick={() => console.log("Deleting...")}
+          onClick={() =>
+            handleDelete(screening?.screening_id, screening?.tempId)
+          }
         />
       )}
     </div>
