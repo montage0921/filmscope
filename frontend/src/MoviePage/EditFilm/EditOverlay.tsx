@@ -5,7 +5,6 @@ import GenreLabels from "../../Utility/GenreLabels";
 import TextArea from "../../Utility/TextArea";
 import { useEditForm } from "./hooks/useFilmEditForm";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 type EditOverLayProps = {
   filmInfo: DetailedFilmInfo | null;
@@ -34,7 +33,6 @@ export default function EditOverlay({
     useEditForm(initialEditableFilmInfo);
   const [allGenres, setAllGenres] = useState(filmInfo?.genres);
   const [updatedMap, setUpdatedMap] = useState(new Map());
-  const navgiate = useNavigate();
 
   function handleUpdate(key: keyof BasicFilmInfo, val: string) {
     let oldValue = undefined;

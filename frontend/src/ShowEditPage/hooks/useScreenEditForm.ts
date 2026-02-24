@@ -29,7 +29,8 @@ export function useScreenEditForm(
   }
 
   function getConstraints(key: keyof Screening, val: number | string) {
-    const stringVal = String(val || "").trim();
+    // const stringVal = String(val || "").trim();
+    console.log(val)
     switch (key) {
       case "start_date":
         return [];
@@ -45,7 +46,8 @@ export function useScreenEditForm(
   }
 
   function checkAllConstraintsGood(key: keyof Screening) {
-    const constraints = getConstraints(key, screeningForChange[key]);
+    // const constraints = getConstraints(key, screeningForChange[key]);
+    console.log(key)
     return true; // temporary
   }
 
