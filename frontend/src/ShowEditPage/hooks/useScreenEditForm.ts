@@ -1,32 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { Screening } from "../../types";
 
-export function useScreenEditForm(initialScreeng: Screening) {
-  const [screeningForChange, setScreeningForChange] =
-    useState(initialScreeng);
+export function useScreenEditForm(
+  initialScreeng: Screening,
+  saveScreening: Dispatch<SetStateAction<Screening[] | undefined>>,
+  isAdding: boolean,
+) {
+  const [screeningForChange, setScreeningForChange] = useState(initialScreeng);
 
   useEffect(() => {
     setScreeningForChange(initialScreeng);
   }, [initialScreeng.screening_id]);
 
   function handleChange(key: keyof Screening, value: string) {
-    setScreeningForChange((prev) => {
-      return {
-        ...prev,
-        [key]: value,
-      };
-    });
+    const updatedScreening = { ...screeningForChange, [key]: value };
+    if (!isAdding) {
+      // if editing existing screen, also add it to screen[]
+      saveScreening((screens) => {
+        const copy = screens?.map((sc) =>
+          sc.screening_id === updatedScreening.screening_id
+            ? updatedScreening
+            : sc,
+        );
+        return copy;
+      });
+    }
+    setScreeningForChange(updatedScreening);
   }
 
-  function getConstraints(
-    key: keyof Screening,
-    val: number | string,
-  ) {
+  function getConstraints(key: keyof Screening, val: number | string) {
     const stringVal = String(val || "").trim();
     switch (key) {
       case "start_date":
-        return [
-        ];
+        return [];
 
       case "start_time":
         return [];

@@ -29,6 +29,8 @@ export default function EditScreening({
       start_time: "",
       ticket_url: "",
     },
+    onChange,
+    isAdding
   );
 
   return (
@@ -82,31 +84,31 @@ export default function EditScreening({
       {isAdding ? (
         <div className="flex gap-3">
           <Button
-                  text="Save"
-                  style={{
-                    backgroundColor: "green", 
-                    fontSize: "14px",
-                  }}
-                  onClick={() => console.log("Deleting...")}
-                />
+            text="Save"
+            style={{
+              backgroundColor: "green",
+              fontSize: "14px",
+            }}
+            onClick={() => console.log("Deleting...")}
+          />
           <Button
-                  text="Cancel"
-                  style={{
-                    backgroundColor: "gray", 
-                    fontSize: "14px",
-                  }}
-                  onClick={() => setIsAdding?.(false)}
-                />
+            text="Cancel"
+            style={{
+              backgroundColor: "gray",
+              fontSize: "14px",
+            }}
+            onClick={() => setIsAdding?.(false)}
+          />
         </div>
       ) : (
         <Button
-                  text="Delete"
-                  style={{
-                    backgroundColor: "red", 
-                    fontSize: "14px",
-                  }}
-                  onClick={() => console.log("Deleting...")}
-                />
+          text="Delete"
+          style={{
+            backgroundColor: "red",
+            fontSize: "14px",
+          }}
+          onClick={() => console.log("Deleting...")}
+        />
       )}
     </div>
   );
