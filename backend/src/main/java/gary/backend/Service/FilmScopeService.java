@@ -17,6 +17,7 @@ import gary.backend.DTO.DetailedFilmPageDto;
 import gary.backend.DTO.EditShowDto;
 import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ScreeningDto;
+import gary.backend.DTO.ShowBasicUpdateDto;
 import gary.backend.DTO.ShowDescriptionDto;
 import gary.backend.DTO.ShowDto;
 import gary.backend.DTO.TheatreDto;
@@ -254,6 +255,66 @@ public class FilmScopeService {
         }
         screeningRepository.deleteById(screening_id);
         return ResponseEntity.ok("The screening is successfully deleted");
+    }
+
+    @Transactional
+    public ResponseEntity<String> updateBasicShowInfo(int show_id, ShowBasicUpdateDto showBasicUpdateDto) {
+        Optional<Show> opShow = showRepository.findById(show_id);
+        if (!opShow.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Please provide a valid show");
+        }
+
+        if (showBasicUpdateDto.getShow_name() == null || showBasicUpdateDto.getShow_name().isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Show title cannot be empty");
+        }
+
+        Show show = opShow.get();
+
+        show.setShow_name(showBasicUpdateDto.getShow_name());
+        show.setQa_with(showBasicUpdateDto.getQa_with());
+        show.setSpecial(showBasicUpdateDto.getSpecial());
+
+        showRepository.save(show);
+
+        return ResponseEntity.ok("Show's basic info is successfully updated");
+    }
+
+    @Transactional
+    public ResponseEntity<String> updateShowTheatre(int show_id, int theatre_id) {
+        Optional<Show> opShow = showRepository.findById(show_id);
+        if (!opShow.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Please provide a valid show");
+        }
+
+        Optional<Theatre> opTheatre = theatreRepository.findById(theatre_id);
+        if (!opTheatre.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Please provide a valid theatre");
+        }
+
+        Show show = opShow.get();
+        Theatre theatre = opTheatre.get();
+        show.setTheatre(theatre);
+
+        showRepository.save(show);
+        return ResponseEntity.ok("Show's theatre is successfully updated");
+    }
+
+    @Transactional
+    public ResponseEntity<String> updateShowScreening(int show_id, List<Screening> newScreenings) {
+        return showRepository.findById(show_id).map(show -> {
+            // 1. Clear current screenings
+            show.getScreenings().clear();
+
+            // 2. Add the new ones from your frontend array
+            // Since it's Unidirectional with @JoinColumn, Hibernate will
+            // automatically set the show_id in the screenings table.
+            show.getScreenings().addAll(newScreenings);
+
+            showRepository.save(show);
+            return ResponseEntity.ok("Screenings updated successfully");
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Show not found"));
     }
 
 }

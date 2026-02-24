@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.RestController;
 import gary.backend.DTO.DetailedFilmPageDto;
 import gary.backend.DTO.EditShowDto;
 import gary.backend.DTO.FilmDto;
+import gary.backend.DTO.ShowBasicUpdateDto;
 import gary.backend.DTO.ShowDescriptionDto;
 import gary.backend.DTO.TheatreDto;
 import gary.backend.Entity.Genre;
+import gary.backend.Entity.Screening;
 import gary.backend.Entity.Show;
 import gary.backend.Service.FilmScopeService;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -80,6 +83,30 @@ public class FilmScopeController {
             @RequestBody List<Genre> genres) {
 
         return filmScopeService.updateFilmGenre(film_id, genres);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/shows/{show_id}")
+    public ResponseEntity<String> updateBasicShowInfo(@PathVariable int show_id, 
+            @RequestBody ShowBasicUpdateDto showBasicUpdateDto) {
+
+        return filmScopeService.updateBasicShowInfo(show_id, showBasicUpdateDto)
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/shows/{show_id}/{theatre_id}")
+    public ResponseEntity<String> updateShowTheatre(@PathVariable int show_id,
+            @PathVariable int theatre_id) {
+
+        return filmScopeService.updateShowTheatre(show_id, theatre_id);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/shows/{show_id}/screenings")
+    public ResponseEntity<String> updateShowScreening(@PathVariable int show_id,
+            @RequestBody List<Screening> screenings) {
+
+        return filmScopeService.updateShowScreening(show_id, screenings);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
