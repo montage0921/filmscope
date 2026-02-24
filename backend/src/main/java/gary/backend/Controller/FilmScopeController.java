@@ -8,6 +8,7 @@ import gary.backend.DTO.FilmDto;
 import gary.backend.DTO.ShowBasicUpdateDto;
 import gary.backend.DTO.ShowDescriptionDto;
 import gary.backend.DTO.TheatreDto;
+import gary.backend.DTO.UpdateShowDto;
 import gary.backend.Entity.Genre;
 import gary.backend.Entity.Screening;
 import gary.backend.Entity.Show;
@@ -87,26 +88,10 @@ public class FilmScopeController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/shows/{show_id}")
-    public ResponseEntity<String> updateBasicShowInfo(@PathVariable int show_id, 
-            @RequestBody ShowBasicUpdateDto showBasicUpdateDto) {
+    public ResponseEntity<String> updateShow(@PathVariable int show_id,
+            @RequestBody UpdateShowDto updateShowDto) {
 
-        return filmScopeService.updateBasicShowInfo(show_id, showBasicUpdateDto)
-    }
-
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping("/shows/{show_id}/{theatre_id}")
-    public ResponseEntity<String> updateShowTheatre(@PathVariable int show_id,
-            @PathVariable int theatre_id) {
-
-        return filmScopeService.updateShowTheatre(show_id, theatre_id);
-    }
-
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping("/shows/{show_id}/screenings")
-    public ResponseEntity<String> updateShowScreening(@PathVariable int show_id,
-            @RequestBody List<Screening> screenings) {
-
-        return filmScopeService.updateShowScreening(show_id, screenings);
+        return filmScopeService.updateShow(show_id, updateShowDto);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

@@ -30,7 +30,7 @@ public class Screening {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "screening_id")
-    private int screening_id;
+    private Integer screening_id;
 
     @Column(name = "start_date")
     private LocalDate start_date;
